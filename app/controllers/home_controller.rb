@@ -7,7 +7,6 @@ class HomeController < ApplicationController
   def init
     templateRes = HelloSign.get_templates
     @templates = helpers.pluckFieldsForTemplateSelection(templateRes)
-    # pp @templates
   end
 
   def getForm

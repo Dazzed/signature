@@ -163,12 +163,6 @@ test:
           mode: :primary
         max_pool_size: 1
 production:
-  sessions:
+  clients:
     default:
-      hosts: 
-        - <%= ENV['MONGODB_URI'] %>
-      database: hello_sign
-      options:
-        read:
-          mode: :primary
-        max_pool_size: 1
+      uri: <%= ENV['MONGODB_URI'] %>
