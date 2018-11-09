@@ -1,0 +1,25 @@
+<form action="/sendEmails" method="post">
+  <p>Signer Roles</p>
+  <input type="text" hidden name="template_id" value="<%= @targetTemplate["template_id"] %>">
+  <% @targetTemplate["signer_roles"].each do |signerRole| %>
+    <div class="form-group">
+      <label>Email of <%= signerRole.data["name"] %>:</label>
+      <input
+        type="text"
+        class="form-control"
+        name="signer_roles[<%= signerRole.data["order"] %>]"
+      >
+    </div>
+  <% end %>
+
+  <p>Custom Fields</p>
+
+  <% @targetTemplate["custom_fields"].each do |customField| %>
+    <div class="form-group">
+      <label><%= customField.data["name"] %>:</label>
+      <input type="text" class="form-control" name="custom_fields[<%= customField.data["api_id"] %>]">
+    </div>
+  <% end %>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
