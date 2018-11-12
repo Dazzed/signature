@@ -7,7 +7,12 @@
       messageListener: function(eventData) {
           if (eventData.event == HelloSign.EVENT_SIGNED) {
             // document.location = "/view_stripe";
-            console.log(10, 'sign success!');
+            console.log(10, 'sign success!', <%= @should_pay %>);
+            var should_pay = <%= @should_pay %>;
+            console.log(12, should_pay);
+            if (should_pay) {
+              document.location = "/view_stripe";
+            }
           }
       }
   });

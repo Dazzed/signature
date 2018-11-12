@@ -9,17 +9,23 @@
         class="form-control"
         name="signer_roles[<%= signerRole.data["order"] %>]"
       >
-    </div>
-  <% end %>
-
-  <p>Custom Fields</p>
-
-  <% @targetTemplate["custom_fields"].each do |customField| %>
-    <div class="form-group">
-      <label><%= customField.data["name"] %>:</label>
-      <input type="text" class="form-control" name="custom_fields[<%= customField.data["api_id"] %>]">
-    </div>
-  <% end %>
-
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+      <div class="form-check">
+        <label class="form-check-label">
+          <input 
+            type="checkbox"
+            class="form-check-input"
+            value="true" 
+            name="signer_roles_pay[<%= signerRole.data["order"] %>]">Is Payee
+        </label>
+      </div>
+      </div>
+    <% end %>
+    <p>Custom Fields</p>
+    <% @targetTemplate["custom_fields"].each do |customField| %>
+      <div class="form-group">
+        <label><%= customField.data["name"] %>:</label>
+        <input type="text" class="form-control" name="custom_fields[<%= customField.data["api_id"] %>]">
+      </div>
+    <% end %>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>

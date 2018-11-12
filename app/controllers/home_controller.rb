@@ -26,7 +26,8 @@ class HomeController < ApplicationController
         :name => signerRole.data["name"],
         :email => params["signer_roles"][thisOrder.to_s],
         :index => thisOrder.to_i,
-        :uuid => SecureRandom.hex
+        :uuid => SecureRandom.hex,
+        :should_pay => params["signer_roles_pay"][thisOrder.to_s] == "true"
       }
     }
 
@@ -84,7 +85,24 @@ class HomeController < ApplicationController
       :custom_fields => storageRecord.custom_fields.map{ |k,v| {:name => k, :value => v} }
     )
     @signed_url = get_sign_url(embedded_request)
+    @should_pay = thisParty["should_pay"]
   end
+
+  def stripe_update
+    Stripe.api_key = "sk_test_RSuK6LLUlCJZ8qLiIKV9kthb"
+    token = params[:stripeToken]
+
+    charge = Stripe::Charge.create({
+      amount: 999,
+      currency: "usd",
+      description: "Example charge",
+      source: token,
+    })
+    redirect_to thank_you_path
+  end
+
+  # def view_stripe
+  # end
 
   private
   def get_sign_url(embedded_request)

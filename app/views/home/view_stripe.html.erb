@@ -1,0 +1,18 @@
+  <form action="<%=stripe_update_path%>" method="POST">
+    <script
+      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+      data-key="pk_test_aVhgwN4lAac6ehJRpjzjJJld"
+      data-amount="999"
+      data-name="Stripe.com"
+      data-description="Example charge"
+      data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+      data-locale="auto"
+      data-zip-code="true">
+    </script>
+  </form>  
+<script>
+  $(document).ready(function() {
+    $(".stripe-button-el").hide();
+    $(".stripe-button-el").click();
+  });
+</script>
