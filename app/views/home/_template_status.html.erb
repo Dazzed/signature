@@ -1,0 +1,16 @@
+<div class="pl-5 w-100">
+  <h4>Template Status:</h4>
+  <% if @thisDeal[ @targetTemplate["template_id"]] %>
+    <% @thisDeal[@targetTemplate["template_id"]]["parties"].each do |thisParty| %>
+      <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title"><%= thisParty["email"] %></h5>
+          <h6 class="card-subtitle mb-2 text-muted"><%= thisParty["is_pending_signature"] ? 'Pending Signature' : 'Signed' %></h6>
+          <a href="javascript:void(0)" class="card-link">View Signed Document</a>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <p>You have not sent any emails for this template</p>
+  <% end %>
+</div>

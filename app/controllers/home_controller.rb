@@ -5,18 +5,53 @@ include SendGrid
 
 class HomeController < ApplicationController
   def init
+    deal_id = params[:deal_id]
+    return render 'errorPage' unless deal_id
+    @thisDeal = Storage.where(:deal_id => deal_id).first
+    if @thisDeal.nil?
+      commonUuid = SecureRandom.hex
+      @thisDeal = Storage.create!({
+        :deal_id => deal_id,
+        :params => params.to_json,
+        :commonUuid => commonUuid,
+      })
+    else
+      @thisDeal.update(:params => params.to_json)
+    end
     templateRes = HelloSign.get_templates
     @templates = helpers.pluckFieldsForTemplateSelection(templateRes)
   end
 
   def getForm
+    unless params[:templateId] && params[:deal_id]
+      return render 'errorPage'
+    end
     targetTemplate = HelloSign.get_template :template_id => params[:templateId]
+    unless targetTemplate
+      return render 'errorPage'
+    end
+    @thisDeal = Storage.where(:deal_id => params[:deal_id]).first
+    @thisDealParams = JSON.parse(@thisDeal.params)
     @targetTemplate = targetTemplate.data
-    render :partial => 'template_form'
+    render json: {
+      template_form: (render_to_string partial: 'template_form', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false),
+      template_status: (render_to_string partial: 'template_status', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false)
+    }
   end
 
   def sendEmails
     template_id = params["template_id"]
+    deal_id = params["deal_id"]
+    # VALIDATIONS
+    unless template_id && deal_id
+      return render 'errorPage'
+    end
+    
+    @thisDeal = Storage.where(:deal_id => deal_id).first
+    unless @thisDeal
+      return render 'errorPage'
+    end
+    # END VALIDATIONS
     targetTemplate = HelloSign.get_template :template_id => params[:template_id]
     targetTemplate = targetTemplate.data
     parties = targetTemplate["signer_roles"].map{ |signerRole|
@@ -27,22 +62,22 @@ class HomeController < ApplicationController
         :email => params["signer_roles"][thisOrder.to_s],
         :index => thisOrder.to_i,
         :uuid => SecureRandom.hex,
-        :should_pay => params["signer_roles_pay"][thisOrder.to_s] == "true"
+        :should_pay => params["signer_roles_pay"][thisOrder.to_s] == "true",
+        :is_pending_signature => true
       }
     }
-
-    # Save the record in database
-    commonUuid = SecureRandom.hex
-    Storage.create!({
-      :parties => parties,
-      :template_id => template_id,
-      :commonUuid => commonUuid,
-      :custom_fields => params["custom_fields"].permit!.to_h
-    })
+    # update the record in database
+    @thisDeal.update(
+      template_id.to_sym => {
+        :parties => parties,
+        :template_id => template_id,
+        :custom_fields => params["custom_fields"].permit!.to_h
+      }
+    )
 
     # Send Email to relevant parties
     parties.each { |thisParty|
-      link = "#{ENV['EMAIL_SIGNING_URL']}?commonUuid=#{commonUuid}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
+      link = "#{ENV['EMAIL_SIGNING_URL']}?commonUuid=#{@thisDeal[:commonUuid]}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
       UserNotifierMailer.send_signature_request_email(parties, thisParty[:email], link).deliver
     }
 
@@ -100,9 +135,6 @@ class HomeController < ApplicationController
     })
     redirect_to thank_you_path
   end
-
-  # def view_stripe
-  # end
 
   private
   def get_sign_url(embedded_request)

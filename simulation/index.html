@@ -1,0 +1,28 @@
+<html>
+  <head>
+  </head>
+  <body style="background: black;">
+    <iframe 
+      id="Example2"
+      title="Example2"
+      width="1680"
+      height="900"
+      frameborder="0"
+      scrolling="yes"
+      marginheight="0"
+      marginwidth="0"
+      src=""
+      >
+    </iframe>
+  </body>
+    <script type="text/javascript">
+      var url = encodeURI(
+        'http://localhost:3000?deal_id=_12345abcd&IsAvailable=Full Time available' + 
+        '&Actual Job Description=Senior React JS Developer&Validity date=Upto April 2019' +
+        '&Manager=sudharsan.ravikumar@gmail.com&Client=supersudh@gmail.com'
+      );
+      console.log(url);
+      var thisIframe = document.getElementById('Example2');
+      thisIframe.src = url;
+    </script>
+</html>

@@ -1,31 +1,65 @@
 <form action="/sendEmails" method="post">
   <p>Signer Roles</p>
   <input type="text" hidden name="template_id" value="<%= @targetTemplate["template_id"] %>">
+  <input type="text" hidden name="deal_id" value="<%= @thisDeal["deal_id"] %>">
+  
   <% @targetTemplate["signer_roles"].each do |signerRole| %>
+    <% 
+      signerEmail = proc {
+        if @thisDealParams[signerRole.data["name"]]
+         @thisDealParams[signerRole.data["name"]]
+        else
+          ''
+        end
+      }.call
+    %>
     <div class="form-group">
       <label>Email of <%= signerRole.data["name"] %>:</label>
       <input
         type="text"
         class="form-control"
         name="signer_roles[<%= signerRole.data["order"] %>]"
+        value="<%= signerEmail %>"
       >
-      <div class="form-check">
-        <label class="form-check-label">
-          <input 
-            type="checkbox"
-            class="form-check-input"
-            value="true" 
-            name="signer_roles_pay[<%= signerRole.data["order"] %>]">Is Payee
-        </label>
-      </div>
+        <div class="form-check">
+          <label class="form-check-label">
+            <input 
+              type="checkbox"
+              class="form-check-input"
+              value="true" 
+              name="signer_roles_pay[<%= signerRole.data["order"] %>]"
+            >Is Payee
+          </label>
+        </div>
       </div>
     <% end %>
     <p>Custom Fields</p>
     <% @targetTemplate["custom_fields"].each do |customField| %>
+      <% value = proc {
+        if @thisDealParams[customField.data["name"]]
+          @thisDealParams[customField.data["name"]]
+        else
+          ''
+        end
+      }.call %>
       <div class="form-group">
         <label><%= customField.data["name"] %>:</label>
-        <input type="text" class="form-control" name="custom_fields[<%= customField.data["api_id"] %>]">
+        <input 
+          type="text"
+          class="form-control"
+          name="custom_fields[<%= customField.data["api_id"] %>]"
+          value="<%= value %>"
+        >
       </div>
     <% end %>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <%
+      submitText = proc {
+        if @thisDeal[@targetTemplate["template_id"]]
+          'Resend'
+        else
+          'Submit'
+        end
+      }.call
+    %>
+    <button type="submit" class="btn btn-primary"><%= submitText %></button>
   </form>

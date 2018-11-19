@@ -1,46 +1,45 @@
-<div class="init-container row p-4">
-  <div class="col-12">
-    <div class="col-6">
-      <div class="text-center">
-        <h3>Select A Template <span class="badge badge-secondary"><%= @templates.length %></span></h3>
-      </div>
-      <div class="list-group">
-        <% @templates.each do |thisTemplate| %>
-          <a 
-            href="javascript:void(0)" 
-            class="list-group-item list-group-item-action flex-column align-items-start"
-            onClick="getTemplate('<%= thisTemplate[:template_id] %>')"
-          >
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1"><%= thisTemplate[:title] %></h5>
-              <small>Total Signers: <%= thisTemplate[:signer_roles].length %></small>
-            </div>
-
-            <p class="mb-1"><%= thisTemplate[:message] %></p>
-
-            <div class="d-flex w-100 justify-content-evenly">
-              <strong>Signers:</strong>&nbsp;&nbsp;
-              <span>
-                <%= thisTemplate[:signer_roles]
-                  .map{|d| d["name"]}
-                  .join(", ") 
-                %>
-              </span>
-            </div>
-            
-            <small>
-              <%= thisTemplate[:documents]
+<div class="row p-4">
+  <div class="col-6">
+    <div class="text-center">
+      <h3>Select A Template <span class="badge badge-secondary"><%= @templates.length %></span></h3>
+    </div>
+    <div class="list-group">
+      <% @templates.each do |thisTemplate| %>
+        <a 
+          href="javascript:void(0)" 
+          class="list-group-item list-group-item-action flex-column align-items-start"
+          onClick="getTemplate('<%= thisTemplate[:template_id] %>', '<%= @thisDeal[:deal_id] %>')"
+        >
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1"><%= thisTemplate[:title] %></h5>
+            <small>Total Signers: <%= thisTemplate[:signer_roles].length %></small>
+          </div>
+          <p class="mb-1"><%= thisTemplate[:message] %></p>
+          <div class="d-flex w-100 justify-content-evenly">
+            <strong>Signers:</strong>&nbsp;&nbsp;
+            <span>
+              <%= thisTemplate[:signer_roles]
                 .map{|d| d["name"]}
                 .join(", ") 
               %>
-            </small>
-          </a>
-        <% end %>
-      </div>
-    </div>
-    <br />
-    <br />
-    <div class="col-6" id="form-container">
+            </span>
+          </div>
+          <small>
+            <%= thisTemplate[:documents]
+              .map{|d| d["name"]}
+              .join(", ") 
+            %>
+          </small>
+        </a>
+      <% end %>
     </div>
   </div>
+  <br />
+  <br />
+  <div class="col-6" id="form-container">
+  </div>
+</div>
+
+<div class="row" id="stats-container">
+
 </div>
