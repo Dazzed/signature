@@ -54,7 +54,7 @@
     <% end %>
     <%
       submitText = proc {
-        if @thisDeal[@targetTemplate["template_id"]]
+        if @thisDeal["stats"]
           'Resend'
         else
           'Submit'

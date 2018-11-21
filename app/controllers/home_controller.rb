@@ -4,6 +4,34 @@ require "time"
 include SendGrid
 
 class HomeController < ApplicationController
+  def callbacks
+    # byebug
+    event = JSON.parse(params["json"])
+    if event["event"]["event_type"] == "signature_request_signed"
+      metadata = event["signature_request"]["metadata"]
+      signature_request_id = event["signature_request"]["signature_request_id"]
+      if metadata
+        commonUuid = metadata["commonUuid"]
+        uuid = metadata["uuid"]
+        storageRecord = Storage.where(:commonUuid => commonUuid).first
+        unless storageRecord.nil?
+          allParties = storageRecord.stats["parties"]
+          thisPartyIndex = allParties.find_index{|party| party["signature_request_id"] == signature_request_id}
+          if thisPartyIndex
+            thisParty = allParties[thisPartyIndex]
+            storageRecord.stats["parties"][thisPartyIndex]["is_pending_signature"] = false
+            storageRecord.stats["parties"][thisPartyIndex]["signed_at"] = Time.now
+            storageRecord.save!
+          end
+        end
+      end
+    end
+    render json: "Hello API Event Received", status: 200
+  end
+
+  def new
+  end
+
   def init
     deal_id = params[:deal_id]
     return render 'errorPage' unless deal_id
@@ -35,7 +63,7 @@ class HomeController < ApplicationController
     @targetTemplate = targetTemplate.data
     render json: {
       template_form: (render_to_string partial: 'template_form', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false),
-      template_status: (render_to_string partial: 'template_status', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false)
+      deal_status: (render_to_string partial: 'template_status', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false)
     }
   end
 
@@ -62,13 +90,13 @@ class HomeController < ApplicationController
         :email => params["signer_roles"][thisOrder.to_s],
         :index => thisOrder.to_i,
         :uuid => SecureRandom.hex,
-        :should_pay => params["signer_roles_pay"][thisOrder.to_s] == "true",
+        :should_pay => params["signer_roles_pay"] ? params["signer_roles_pay"][thisOrder.to_s] == "true" : false,
         :is_pending_signature => true
       }
     }
     # update the record in database
     @thisDeal.update(
-      template_id.to_sym => {
+      :stats => {
         :parties => parties,
         :template_id => template_id,
         :custom_fields => params["custom_fields"].permit!.to_h
@@ -81,7 +109,7 @@ class HomeController < ApplicationController
       UserNotifierMailer.send_signature_request_email(parties, thisParty[:email], link).deliver
     }
 
-    redirect_to '/'
+    redirect_to home_success_path
   end
 
   def initiateSigning
@@ -98,8 +126,8 @@ class HomeController < ApplicationController
       return render 'errorPage'
     end
 
-    thisParty = storageRecord.parties.find{ |party| party["uuid"] == uuid }
-
+    thisPartyIndex = storageRecord.stats["parties"].find_index{ |party| party["uuid"] == uuid }
+    thisParty = storageRecord.stats["parties"][thisPartyIndex]
     unless thisParty
       return render 'errorPage'
     end
@@ -107,7 +135,7 @@ class HomeController < ApplicationController
     embedded_request = HelloSign.create_embedded_signature_request_with_template(
       :test_mode => 1,
       :client_id => ENV["HELLO_SIGN_CLIENT_ID"],
-      :template_id => storageRecord.template_id,
+      :template_id => storageRecord.stats["template_id"],
       :subject => 'Test Subject',
       :message => "Signature requested at #{Time.now}",
       :signers => [
@@ -117,8 +145,19 @@ class HomeController < ApplicationController
           :role => thisParty["name"]
         }
       ],
-      :custom_fields => storageRecord.custom_fields.map{ |k,v| {:name => k, :value => v} }
+      :custom_fields => storageRecord.stats["custom_fields"].map{ |k,v| {:name => k, :value => v} },
+      :metadata => {
+        "commonUuid": commonUuid,
+        "uuid": uuid
+      }
     )
+
+    pp embedded_request.data["signature_request_id"]
+
+    signature_request_id = embedded_request.data["signature_request_id"]
+    storageRecord.stats["parties"][thisPartyIndex]["signature_request_id"] = signature_request_id
+    storageRecord.save!
+
     @signed_url = get_sign_url(embedded_request)
     @should_pay = thisParty["should_pay"]
   end
@@ -134,6 +173,9 @@ class HomeController < ApplicationController
       source: token,
     })
     redirect_to thank_you_path
+  end
+
+  def success
   end
 
   private

@@ -4,7 +4,7 @@ function getTemplate(templateId, dealId) {
     success: function(data) {
       console.log(5, data);
       $('#form-container').html(data.template_form);
-      $('#stats-container').html(data.template_status);
+      $('#stats-container').html(data.deal_status);
     },
     error: function (err) {
       console.log('Error in getTemplate');
