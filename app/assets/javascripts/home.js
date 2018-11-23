@@ -12,5 +12,7 @@ function getTemplate(templateId, dealId) {
 }
 
 $(function() {
-  
+  if (location.pathname.indexOf('init_alternate') !== -1) {
+    $('#deal-details-tab li:nth-child(2) a').tab('show');
+  }
 });

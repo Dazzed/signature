@@ -4,16 +4,7 @@ require "time"
 include SendGrid
 
 class HomeController < ApplicationController
-  def callbacks
-    # byebug
-    event = JSON.parse(params["json"])
-    if event["event"]["event_type"] == "signature_request_signed"
-      helpers.signature_request_signed_callback(event)
-    end
-    render json: "Hello API Event Received", status: 200
-  end
-
-  def init
+  def initDealData
     # Validate deal_id
     deal_id = params[:deal_id]
     return render 'errorPage' unless deal_id
@@ -38,7 +29,7 @@ class HomeController < ApplicationController
     @templates = helpers.pluckFieldsForTemplateSelection(templateRes)
   end
 
-  def getForm
+  def getFormForTemplate
     # Validate presence of templateId
     unless params[:templateId] && params[:deal_id]
       return render 'errorPage'
@@ -52,12 +43,19 @@ class HomeController < ApplicationController
     @thisDealParams = JSON.parse(@thisDeal.params)
     @targetTemplate = targetTemplate.data
     render json: {
-      template_form: (render_to_string partial: 'template_form', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false),
+      template_form: (
+        render_to_string partial: 'template_form', locals: {
+          thisDeal: @thisDeal,
+          thisDealParams: @thisDealParams,
+          targetTemplate:  @targetTemplate
+        },
+        layout: false
+      ),
       # deal_status: (render_to_string partial: 'template_status', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false)
     }
   end
 
-  def sendEmails
+  def emailDocumentForSignature
     template_id = params["template_id"]
     deal_id = params["deal_id"]
     # VALIDATIONS
@@ -89,26 +87,27 @@ class HomeController < ApplicationController
         :is_pending_signature => true
       }
     }
-    # Create a new contract in database
-    new_contract = Document.create({
-      :name => params["contractName"],
+    # Create a new document in database
+    new_document = Document.create({
       :storage_id => @thisDeal.id,
       :deal_id => deal_id,
       :parties => parties,
       :template_id => template_id,
-      :custom_fields => params["custom_fields"].permit!.to_h
+      :deal_attributes => params["custom_fields"].permit!.to_h
     })
 
     # Send Email to relevant parties
     parties.each { |thisParty|
-      link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{new_contract.id.to_s}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
-      UserNotifierMailer.send_signature_request_email(parties, thisParty[:email], link).deliver
+      if thisParty[:order] == 0
+        link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{new_document.id.to_s}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
+        UserNotifierMailer.send_signature_request_email(parties, thisParty[:email], link).deliver
+      end
     }
 
-    redirect_to home_success_path
+    redirect_to "/init_alternate/#{deal_id}?showStatus=true"
   end
 
-  def initiateSigning
+  def initiateSignature
     # VALIDATIONS
     uuid = params[:uuid]
     order = params[:order]
@@ -127,6 +126,9 @@ class HomeController < ApplicationController
     return render 'errorPage' if thisPartyIndex.nil?
     thisParty = thisContract.parties[thisPartyIndex]
 
+    # Redirect user to already signed page if he has already signed
+    return render 'already_signed_warning' if thisParty["is_pending_signature"] != true
+
     # END VALIDATIONS
 
     embedded_request = HelloSign.create_embedded_signature_request_with_template(
@@ -142,7 +144,7 @@ class HomeController < ApplicationController
           :role => thisParty["name"]
         }
       ],
-      :custom_fields => thisContract.custom_fields.map{ |k,v| {:name => k, :value => v} },
+      :custom_fields => thisContract.deal_attributes.map{ |k,v| {:name => k, :value => v} },
       :metadata => {
         "contract_id": contract_id,
         "uuid": uuid

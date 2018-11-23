@@ -45,10 +45,10 @@
       <div class="tab-pane fade" id="contracts" role="tabpanel" aria-labelledby="contracts-tab">
         <div class="">
           <% if @contracts.length > 0 %>
-            <% @contracts.each.with_index do |thisContract, index| %>
+            <% @contracts.reverse.each.with_index do |thisContract, index| %>
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title"><%= "##{index + 1} #{thisContract.name}"%></h5>
+                  <h5 class="card-title"><%= "##{index + 1} #{thisContract.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
                   <% thisContract.parties.each do |thisParty| %>
                     <div class="card-subtitle mb-4 text-muted">
                       <p>Role: <%= thisParty["name"] %> (<% if thisParty["is_pending_signature"] %>
