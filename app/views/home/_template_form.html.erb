@@ -3,7 +3,10 @@
   <p>Signer Roles</p>
   <input type="text" hidden name="template_id" value="<%= @targetTemplate["template_id"] %>">
   <input type="text" hidden name="deal_id" value="<%= @thisDeal["deal_id"] %>">
-  
+  <div class="form-group">
+    <label>Contract Name:</label>
+    <input type="text" class="form-control" name="contractName">
+  </div>
   <% @targetTemplate["signer_roles"].each do |signerRole| %>
     <% 
       signerEmail = proc {

@@ -8,23 +8,7 @@ class HomeController < ApplicationController
     # byebug
     event = JSON.parse(params["json"])
     if event["event"]["event_type"] == "signature_request_signed"
-      metadata = event["signature_request"]["metadata"]
-      signature_request_id = event["signature_request"]["signature_request_id"]
-      if metadata
-        commonUuid = metadata["commonUuid"]
-        uuid = metadata["uuid"]
-        storageRecord = Storage.where(:commonUuid => commonUuid).first
-        unless storageRecord.nil?
-          allParties = storageRecord.stats["parties"]
-          thisPartyIndex = allParties.find_index{|party| party["signature_request_id"] == signature_request_id}
-          if thisPartyIndex
-            thisParty = allParties[thisPartyIndex]
-            storageRecord.stats["parties"][thisPartyIndex]["is_pending_signature"] = false
-            storageRecord.stats["parties"][thisPartyIndex]["signed_at"] = Time.now
-            storageRecord.save!
-          end
-        end
-      end
+      helpers.signature_request_signed_callback(event)
     end
     render json: "Hello API Event Received", status: 200
   end
@@ -33,24 +17,32 @@ class HomeController < ApplicationController
   end
 
   def init
+    # Validate deal_id
     deal_id = params[:deal_id]
     return render 'errorPage' unless deal_id
     @thisDeal = Storage.where(:deal_id => deal_id).first
+    # If this is a new deal, Then create a new deal and assign it a common uuid
+    # Also save the incoming dynamic params in the deal.
     if @thisDeal.nil?
       commonUuid = SecureRandom.hex
-      @thisDeal = Storage.create!({
+      @thisDeal = Storage.create({
         :deal_id => deal_id,
         :params => params.to_json,
         :commonUuid => commonUuid,
       })
     else
+      # IF the deal record already exists, then simply update the dynamic params
       @thisDeal.update(:params => params.to_json)
     end
+    # Fetch all contracts related to this deal for display in the view.
+    @contracts = Contract.where(:deal_id => deal_id)
+    # Fetch all templates from Hellosign that can be used for a new contract
     templateRes = HelloSign.get_templates
     @templates = helpers.pluckFieldsForTemplateSelection(templateRes)
   end
 
   def getForm
+    # Validate presence of templateId
     unless params[:templateId] && params[:deal_id]
       return render 'errorPage'
     end
@@ -58,12 +50,13 @@ class HomeController < ApplicationController
     unless targetTemplate
       return render 'errorPage'
     end
+    # Fetch the deal record and get the dynamic params.
     @thisDeal = Storage.where(:deal_id => params[:deal_id]).first
     @thisDealParams = JSON.parse(@thisDeal.params)
     @targetTemplate = targetTemplate.data
     render json: {
       template_form: (render_to_string partial: 'template_form', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false),
-      deal_status: (render_to_string partial: 'template_status', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false)
+      # deal_status: (render_to_string partial: 'template_status', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false)
     }
   end
 
@@ -80,32 +73,37 @@ class HomeController < ApplicationController
       return render 'errorPage'
     end
     # END VALIDATIONS
+
+    # Fetch the template from hellosign and fill in the dynamic read-only params placeholder info.
     targetTemplate = HelloSign.get_template :template_id => params[:template_id]
     targetTemplate = targetTemplate.data
+    # Construct parties info to save in the newly created contract based on info from the hellosign template and form data
     parties = targetTemplate["signer_roles"].map{ |signerRole|
-      thisOrder = signerRole.data["order"]
+      thisOrder = signerRole.data["order"] # order is the signer order
       {
         :order => thisOrder,
         :name => signerRole.data["name"],
         :email => params["signer_roles"][thisOrder.to_s],
         :index => thisOrder.to_i,
         :uuid => SecureRandom.hex,
+        # Bool signer_roles_pay[order] from view will reveal if the signee in the order must pay.
         :should_pay => params["signer_roles_pay"] ? params["signer_roles_pay"][thisOrder.to_s] == "true" : false,
         :is_pending_signature => true
       }
     }
-    # update the record in database
-    @thisDeal.update(
-      :stats => {
-        :parties => parties,
-        :template_id => template_id,
-        :custom_fields => params["custom_fields"].permit!.to_h
-      }
-    )
+    # Create a new contract in database
+    new_contract = Contract.create({
+      :name => params["contractName"],
+      :storage_id => @thisDeal.id,
+      :deal_id => deal_id,
+      :parties => parties,
+      :template_id => template_id,
+      :custom_fields => params["custom_fields"].permit!.to_h
+    })
 
     # Send Email to relevant parties
     parties.each { |thisParty|
-      link = "#{ENV['EMAIL_SIGNING_URL']}?commonUuid=#{@thisDeal[:commonUuid]}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
+      link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{new_contract.id.to_s}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
       UserNotifierMailer.send_signature_request_email(parties, thisParty[:email], link).deliver
     }
 
@@ -113,29 +111,30 @@ class HomeController < ApplicationController
   end
 
   def initiateSigning
+    # VALIDATIONS
     uuid = params[:uuid]
     order = params[:order]
-    commonUuid = params[:commonUuid]
-    unless uuid and order and commonUuid
-      return render 'errorPage'
-    end
-    
-    storageRecord = Storage.where(:commonUuid => commonUuid).first
-    
-    unless storageRecord and !storageRecord.try(:expired)
+    contract_id = params[:contract_id]
+    unless uuid and order and contract_id
       return render 'errorPage'
     end
 
-    thisPartyIndex = storageRecord.stats["parties"].find_index{ |party| party["uuid"] == uuid }
-    thisParty = storageRecord.stats["parties"][thisPartyIndex]
-    unless thisParty
+    thisContract = Contract.find(contract_id)
+
+    unless thisContract and !thisContract.try(:expired)
       return render 'errorPage'
     end
+
+    thisPartyIndex = thisContract.parties.find_index{ |party| party["uuid"] == uuid }
+    return render 'errorPage' if thisPartyIndex.nil?
+    thisParty = thisContract.parties[thisPartyIndex]
+
+    # END VALIDATIONS
 
     embedded_request = HelloSign.create_embedded_signature_request_with_template(
       :test_mode => 1,
       :client_id => ENV["HELLO_SIGN_CLIENT_ID"],
-      :template_id => storageRecord.stats["template_id"],
+      :template_id => thisContract.template_id,
       :subject => 'Test Subject',
       :message => "Signature requested at #{Time.now}",
       :signers => [
@@ -145,21 +144,20 @@ class HomeController < ApplicationController
           :role => thisParty["name"]
         }
       ],
-      :custom_fields => storageRecord.stats["custom_fields"].map{ |k,v| {:name => k, :value => v} },
+      :custom_fields => thisContract.custom_fields.map{ |k,v| {:name => k, :value => v} },
       :metadata => {
-        "commonUuid": commonUuid,
+        "contract_id": contract_id,
         "uuid": uuid
       }
     )
 
-    pp embedded_request.data["signature_request_id"]
-
     signature_request_id = embedded_request.data["signature_request_id"]
-    storageRecord.stats["parties"][thisPartyIndex]["signature_request_id"] = signature_request_id
-    storageRecord.save!
+    # Unique signature request id for the party
+    thisContract.parties[thisPartyIndex]["signature_request_id"] = signature_request_id
+    thisContract.save!
 
     @signed_url = get_sign_url(embedded_request)
-    @should_pay = thisParty["should_pay"]
+    @should_pay = thisContract.parties[thisPartyIndex]["should_pay"]
   end
 
   def stripe_update

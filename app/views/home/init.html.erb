@@ -37,7 +37,34 @@
   <br />
   <br />
   <div class="col-6" id="stats-container">
-</div>
+    <div class="w-100 p-5">
+      <h4>Contracts:</h4>
+      <% if @contracts.length > 0 %>
+        <% @contracts.each.with_index do |thisContract, index| %>
+          <div class="card" style="width: 40rem;">
+            <div class="card-body">
+              <h5 class="card-title"><%= "##{index + 1} #{thisContract.name}" %></h5>
+              <% thisContract.parties.each do |thisParty| %>
+                <h6 class="card-subtitle mb-2 text-muted">
+                  <p>Role: <%= thisParty["name"] %></p>
+                  <p>Email: <%= thisParty["email"] %></p>
+                  <% if thisParty["is_pending_signature"] %>
+                    <span class="red">Pending Signature</span>
+                  <% else %>
+                    <span class="green">Signed at <%= thisParty["signed_at"] %></span>
+                  <% end %>
+                </h6>
+                <a href="javascript:void(0)" class="card-link">View Signed Document</a>
+                <br />
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p>You have not created any contracts for this deal</p>
+      <% end %>
+    </div>
+  </div>
 </div>
 <div class="row p-4" id="form-container">
 </div>

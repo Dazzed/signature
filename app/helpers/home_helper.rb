@@ -26,4 +26,24 @@ module HomeHelper
       }
     }
   end
+
+  def signature_request_signed_callback(event)
+    metadata = event["signature_request"]["metadata"]
+    signature_request_id = event["signature_request"]["signature_request_id"]
+    if metadata
+      contract_id = metadata["contract_id"]
+      uuid = metadata["uuid"]
+      thisContract = Contract.find(contract_id)
+      unless thisContract.nil?
+        allParties = thisContract.parties
+        thisPartyIndex = allParties.find_index{|party| party["signature_request_id"] == signature_request_id}
+        if thisPartyIndex
+          thisParty = allParties[thisPartyIndex]
+          thisContract.parties[thisPartyIndex]["is_pending_signature"] = false
+          thisContract.parties[thisPartyIndex]["signed_at"] = Time.now
+          thisContract.save!
+        end
+      end
+    end
+  end
 end
