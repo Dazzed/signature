@@ -1,6 +1,10 @@
 // Place all the styles related to the Home controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+* {
+  font-family: 'Nunito Sans';
+}
+
 .centering-request {
   width: 400px;
   height: 400px;
@@ -27,14 +31,44 @@ label {
   width: 100%;
 }
 
-#form-container {
-  border-left: 2px solid grey;
-}
-
 .red {
-  color: red;
+  color: #cc0000;
 }
 
 .green {
-  color: green;
+  color: #00cc00;
+}
+
+.card {
+  border: 0;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.04), 0 2px 2px 0 rgba(0, 0, 0, 0.08);
+  margin: 10px 0;
+}
+
+.signers-label {
+  font-weight: 500;
+  font-size: 0.8em;
+}
+
+.list-group-item {
+  border: 0;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.04), 0 2px 2px 0 rgba(0, 0, 0, 0.08);
+  margin: 10px 0;
+}
+
+.deal-message {
+  color: lighten(#000000, 0.5);
+  font-size: 0.8em;
+}
+.signers {
+  color: brighten(#000000, 0.5);
+  text-transform: capitalize;
+  margin-right: 5px;
+}
+.card-subtitle {
+  color: lighten(#000000, 0.5);
+}
+
+p {
+  margin-bottom: 0;
 }

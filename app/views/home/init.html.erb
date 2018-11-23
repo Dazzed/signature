@@ -1,5 +1,5 @@
 <div class="row p-4">
-  <div class="col-6">
+  <div class="col-md-6">
     <div class="text-center">
       <h3>Select A Template <span class="badge badge-secondary"><%= @templates.length %></span></h3>
     </div>
@@ -8,21 +8,17 @@
         <a 
           href="javascript:void(0)" 
           class="list-group-item list-group-item-action flex-column align-items-start"
-          onClick="getTemplate('<%= thisTemplate[:template_id] %>', '<%= @thisDeal[:deal_id] %>')"
-        >
+          onClick="getTemplate('<%= thisTemplate[:template_id] %>', '<%= @thisDeal[:deal_id] %>')">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1"><%= thisTemplate[:title] %></h5>
-            <small>Total Signers: <%= thisTemplate[:signer_roles].length %></small>
+            <small>Total Signers: <span class="badge badge-pill badge-success"><%= thisTemplate[:signer_roles].length %></span></small>
           </div>
-          <p class="mb-1"><%= thisTemplate[:message] %></p>
+          <p class="mb-1 deal-message"><%= thisTemplate[:message] %></p>
           <div class="d-flex w-100 justify-content-evenly">
-            <strong>Signers:</strong>&nbsp;&nbsp;
-            <span>
-              <%= thisTemplate[:signer_roles]
-                .map{|d| d["name"]}
-                .join(", ") 
-              %>
-            </span>
+            <span class="signers-label">Signatories: &nbsp; </span> 
+            <% thisTemplate[:signer_roles].map do |d| %> 
+              <span class="signers badge badge-pill badge-info"><%= d["name"] %></span>
+            <% end %>
           </div>
           <small>
             <%= thisTemplate[:documents]
@@ -36,36 +32,46 @@
   </div>
   <br />
   <br />
-  <div class="col-6" id="stats-container">
-    <div class="w-100 p-5">
-      <h4>Contracts:</h4>
-      <% if @contracts.length > 0 %>
-        <% @contracts.each.with_index do |thisContract, index| %>
-          <div class="card" style="width: 40rem;">
-            <div class="card-body">
-              <h5 class="card-title"><%= "##{index + 1} #{thisContract.name}" %></h5>
-              <% thisContract.parties.each do |thisParty| %>
-                <h6 class="card-subtitle mb-2 text-muted">
-                  <p>Role: <%= thisParty["name"] %></p>
-                  <p>Email: <%= thisParty["email"] %></p>
-                  <% if thisParty["is_pending_signature"] %>
-                    <span class="red">Pending Signature</span>
-                  <% else %>
-                    <span class="green">Signed at <%= thisParty["signed_at"] %></span>
+  <div class="col-md-6" id="stats-container">
+    <ul class="nav nav-tabs" id="deal-details-tab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="contracts-tab" data-toggle="tab" href="#contracts" role="tab" aria-controls="contracts" aria-selected="true">Contracts</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="form-tab" data-toggle="tab" href="#form" role="tab" aria-controls="form" aria-selected="false">Deal Form</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="deal-details-content">
+      <div class="tab-pane fade show active" id="contracts" role="tabpanel" aria-labelledby="contracts-tab">
+        <div class="">
+          <% if @contracts.length > 0 %>
+            <% @contracts.each.with_index do |thisContract, index| %>
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><%= "##{index + 1} #{thisContract.name}"%></h5>
+                  <% thisContract.parties.each do |thisParty| %>
+                    <div class="card-subtitle mb-4 text-muted">
+                      <p>Role: <%= thisParty["name"] %> (<% if thisParty["is_pending_signature"] %>
+                        <span class="red">Pending Signature</span>
+                      <% else %>
+                        <span class="green">Signed at <%= thisParty["signed_at"].strftime("%m/%d/%Y %h:%m:%p") %></span>
+                      <% end %>)</p>
+                      <p>Email: <%= thisParty["email"] %></p>
+                    </div>
                   <% end %>
-                </h6>
-                <a href="javascript:void(0)" class="card-link">View Signed Document</a>
-                <br />
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-      <% else %>
-        <p>You have not created any contracts for this deal</p>
-      <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <p>You have not created any contracts for this deal</p>
+          <% end %>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="form" role="tabpanel" aria-labelledby="form-tab">
+        <div class="row p-4" id="form-container"></div>
+      </div>
     </div>
   </div>
 </div>
-<div class="row p-4" id="form-container">
-</div>
+
 
