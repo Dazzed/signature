@@ -13,9 +13,6 @@ class HomeController < ApplicationController
     render json: "Hello API Event Received", status: 200
   end
 
-  def new
-  end
-
   def init
     # Validate deal_id
     deal_id = params[:deal_id]
@@ -76,9 +73,10 @@ class HomeController < ApplicationController
 
     # Fetch the template from hellosign and fill in the dynamic read-only params placeholder info.
     targetTemplate = HelloSign.get_template :template_id => params[:template_id]
-    targetTemplate = targetTemplate.data
+    return render 'errorPage' unless targetTemplate
+    targetTemplateData = targetTemplate.data
     # Construct parties info to save in the newly created contract based on info from the hellosign template and form data
-    parties = targetTemplate["signer_roles"].map{ |signerRole|
+    parties = targetTemplateData["signer_roles"].map{ |signerRole|
       thisOrder = signerRole.data["order"] # order is the signer order
       {
         :order => thisOrder,
