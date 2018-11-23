@@ -1,6 +1,6 @@
 require "time"
 
-class Contract
+class Document
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
   store_in collection: "contracts"

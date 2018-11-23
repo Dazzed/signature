@@ -35,7 +35,7 @@ class HomeController < ApplicationController
       @thisDeal.update(:params => params.to_json)
     end
     # Fetch all contracts related to this deal for display in the view.
-    @contracts = Contract.where(:deal_id => deal_id)
+    @contracts = Document.where(:deal_id => deal_id)
     # Fetch all templates from Hellosign that can be used for a new contract
     templateRes = HelloSign.get_templates
     @templates = helpers.pluckFieldsForTemplateSelection(templateRes)
@@ -92,7 +92,7 @@ class HomeController < ApplicationController
       }
     }
     # Create a new contract in database
-    new_contract = Contract.create({
+    new_contract = Document.create({
       :name => params["contractName"],
       :storage_id => @thisDeal.id,
       :deal_id => deal_id,
@@ -119,7 +119,7 @@ class HomeController < ApplicationController
       return render 'errorPage'
     end
 
-    thisContract = Contract.find(contract_id)
+    thisContract = Document.find(contract_id)
 
     unless thisContract and !thisContract.try(:expired)
       return render 'errorPage'
