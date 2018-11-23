@@ -1,61 +1,70 @@
-<div class="col-6">
+<div class="col-12">
   <form action="/sendEmails" method="post">
-  <p>Signer Roles</p>
-  <input type="text" hidden name="template_id" value="<%= @targetTemplate["template_id"] %>">
-  <input type="text" hidden name="deal_id" value="<%= @thisDeal["deal_id"] %>">
-  <div class="form-group">
-    <label>Contract Name:</label>
-    <input type="text" class="form-control" name="contractName">
-  </div>
-  <% @targetTemplate["signer_roles"].each do |signerRole| %>
-    <% 
-      signerEmail = proc {
-        if @thisDealParams[signerRole.data["name"]]
-         @thisDealParams[signerRole.data["name"]]
-        else
-          ''
-        end
-      }.call
-    %>
-    <div class="form-group">
-      <label>Email of <%= signerRole.data["name"] %>:</label>
-      <input
-        type="text"
-        class="form-control"
-        name="signer_roles[<%= signerRole.data["order"] %>]"
-        value="<%= signerEmail %>"
-      >
-        <div class="form-check">
-          <label class="form-check-label">
-            <input 
-              type="checkbox"
-              class="form-check-input"
-              value="true" 
-              name="signer_roles_pay[<%= signerRole.data["order"] %>]"
-            >Is Payee
-          </label>
-        </div>
-      </div>
-    <% end %>
-    <p>Custom Fields</p>
-    <% @targetTemplate["custom_fields"].each do |customField| %>
-      <% value = proc {
-        if @thisDealParams[customField.data["name"]]
-          @thisDealParams[customField.data["name"]]
-        else
-          ''
-        end
-      }.call %>
+    <input type="text" hidden name="template_id" value="<%= @targetTemplate["template_id"] %>">
+    <input type="text" hidden name="deal_id" value="<%= @thisDeal["deal_id"] %>">
+    <div class="card">
       <div class="form-group">
-        <label><%= customField.data["name"] %>:</label>
-        <input 
-          type="text"
-          class="form-control"
-          name="custom_fields[<%= customField.data["api_id"] %>]"
-          value="<%= value %>"
-        >
+        <label>Contract Name:</label>
+        <input type="text" class="form-control" name="contractName" />
       </div>
-    <% end %>
+    </div>
+
+
+    <div class="card">
+      <h5 class="card-title">Signer Roles</h5>
+      <% @targetTemplate["signer_roles"].each do |signerRole| %>
+        <% 
+          signerEmail = proc {
+            if @thisDealParams[signerRole.data["name"]]
+            @thisDealParams[signerRole.data["name"]]
+            else
+              ''
+            end
+          }.call
+        %>
+        <div class="form-group">
+          <label><%= signerRole.data["name"] %> Email:</label>
+          <input
+            type="text"
+            class="form-control"
+            name="signer_roles[<%= signerRole.data["order"] %>]"
+            value="<%= signerEmail %>" />
+          <div class="form-check">
+            <label class="form-check-label">
+              <input 
+                type="checkbox"
+                class="form-check-input"
+                value="true" 
+                name="signer_roles_pay[<%= signerRole.data["order"] %>]"
+              >Is Payee
+            </label>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <div class="card">
+      <% if @targetTemplate["custom_fields"].count > 0 %>
+        <h5>Custom Fields</h5>
+      <% end %>
+      <% @targetTemplate["custom_fields"].each do |customField| %>
+        <% value = proc {
+          if @thisDealParams[customField.data["name"]]
+            @thisDealParams[customField.data["name"]]
+          else
+            ''
+          end
+        }.call %>
+        <div class="form-group">
+          <label><%= customField.data["name"] %>:</label>
+          <input 
+            type="text"
+            class="form-control"
+            name="custom_fields[<%= customField.data["api_id"] %>]"
+            value="<%= value %>"
+          >
+        </div>
+      <% end %>
+    </div>
     <%
       submitText = proc {
         if @thisDeal["stats"]
