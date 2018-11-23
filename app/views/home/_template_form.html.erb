@@ -1,4 +1,5 @@
-<form action="/sendEmails" method="post">
+<div class="col-6">
+  <form action="/sendEmails" method="post">
   <p>Signer Roles</p>
   <input type="text" hidden name="template_id" value="<%= @targetTemplate["template_id"] %>">
   <input type="text" hidden name="deal_id" value="<%= @thisDeal["deal_id"] %>">
@@ -63,3 +64,4 @@
     %>
     <button type="submit" class="btn btn-primary"><%= submitText %></button>
   </form>
+</div>
