@@ -43,6 +43,7 @@ label {
   border: 0;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.04), 0 2px 2px 0 rgba(0, 0, 0, 0.08);
   margin: 10px 0;
+  padding: 0.5em;
 }
 
 .signers-label {
@@ -71,4 +72,22 @@ label {
 
 p {
   margin-bottom: 0;
+}
+.nav-tabs .nav-link.active {
+  border-width: 0 0 3px 0;
+  border-color: #495057;
+}
+
+.nav-tabs .nav-link, .nav-tabs .nav-link:hover {
+  border-width: 0 0 3px 0;
+}
+
+.nav-tabs a.nav-link {
+  color: lighten( #495057, 0.1);
+}
+.form-group {
+  margin: 1em;
+}
+.btn {
+  width: 100%;
 }
