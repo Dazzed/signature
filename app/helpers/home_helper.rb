@@ -33,7 +33,7 @@ module HomeHelper
     if metadata
       contract_id = metadata["contract_id"]
       uuid = metadata["uuid"]
-      thisContract = Contract.find(contract_id)
+      thisContract = Document.find(contract_id)
       unless thisContract.nil?
         allParties = thisContract.parties
         thisPartyIndex = allParties.find_index{|party| party["signature_request_id"] == signature_request_id}
