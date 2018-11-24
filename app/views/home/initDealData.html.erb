@@ -48,7 +48,7 @@
             <% @contracts.reverse.each.with_index do |thisContract, index| %>
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title"><%= "##{index + 1} #{thisContract.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
+                  <h5 class="card-title"><%= "##{@contracts.length - index + 1} #{thisContract.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
                   <% thisContract.parties.each do |thisParty| %>
                     <div class="card-subtitle mb-4 text-muted">
                       <p>Role: <%= thisParty["name"] %> (<% if thisParty["is_pending_signature"] %>

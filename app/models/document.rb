@@ -1,5 +1,10 @@
 require "time"
 
+# deal_id (Object_id)
+# parties (Array)
+# template_id(String)
+# deal_attributes (Object)
+# createdAt(Date)
 class Document
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic

@@ -1,6 +1,10 @@
 require "time"
 
 class Storage
+  # deal_id (ObjectId)
+  # params (Object)
+  # commonUuid (String)
+  # createdAt (Date)
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
   store_in collection: "storage"
