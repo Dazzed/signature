@@ -1,5 +1,6 @@
 <html>
   <head>
+    <title>Deal Simulation</title>
     <style type="text/css">
       body {
         padding: 0;
@@ -7,10 +8,10 @@
       }
     </style>
   </head>
-  <body style="background: black;">
+  <body style="background:#000;">
     <iframe 
-      id="Example2"
-      title="Example2"
+      id="deal_frame"
+      title="Deal Frame"
       width="100%"
       height="900"
       frameborder="0"
@@ -23,12 +24,11 @@
   </body>
     <script type="text/javascript">
       var url = encodeURI(
-        'https://fundthat-staging.herokuapp.com?deal_id=_12345abcg&IsAvailable=Full Time available' + 
+        'http://localhost:3000?deal_id=_1234&IsAvailable=Full Time available' + 
         '&Actual Job Description=Senior React JS Developer&Validity date=Upto April 2019' +
-        '&Manager=sudharsan.ravikumar@gmail.com&Client=supersudh@gmail.com'
+        '&Manager=niraj.bothra@gmail.com&Client=sameep.dev@gmail.com'
       );
-
-      var thisIframe = document.getElementById('Example2');
+      var thisIframe = document.getElementById('deal_frame');
       thisIframe.src = url;
     </script>
 </html>

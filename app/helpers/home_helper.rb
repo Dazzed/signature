@@ -1,6 +1,6 @@
 module HomeHelper
-  def pluckFieldsForTemplateSelection(templateResponse)
-    return templateResponse.data["templates"].map { |thisTemplate|
+  def pluckFieldsForTemplateSelection(template_response)
+    return template_response.data["templates"].map { |thisTemplate|
       template_id, 
       reusable_form_id,
       title,

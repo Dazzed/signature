@@ -1,15 +1,15 @@
 <div class="col-12">
   <form id="initiate_signing_form" action="/sendEmails" method="post">
     <input type="text" hidden name="template_id" value="<%= @targetTemplate["template_id"] %>">
-    <input type="text" hidden name="deal_id" value="<%= @thisDeal["deal_id"] %>">
+    <input type="text" hidden name="deal_id" value="<%= @this_deal["deal_id"] %>">
     
     <div class="card">
       <h5 class="card-title">Signer Roles</h5>
       <% @targetTemplate["signer_roles"].each do |signerRole| %>
         <% 
           signerEmail = proc {
-            if @thisDealParams[signerRole.data["name"]]
-            @thisDealParams[signerRole.data["name"]]
+            if @this_deal_params[signerRole.data["name"]]
+            @this_deal_params[signerRole.data["name"]]
             else
               ''
             end
@@ -41,8 +41,8 @@
       <% end %>
       <% @targetTemplate["custom_fields"].each do |customField| %>
         <% value = proc {
-          if @thisDealParams[customField.data["name"]]
-            @thisDealParams[customField.data["name"]]
+          if @this_deal_params[customField.data["name"]]
+            @this_deal_params[customField.data["name"]]
           else
             ''
           end
@@ -60,7 +60,7 @@
     </div>
     <%
       submitText = proc {
-        if @thisDeal["stats"]
+        if @this_deal["stats"]
           'Resend'
         else
           'Submit'

@@ -1,7 +1,7 @@
 <div class="w-100 p-5">
   <h4>Template Status:</h4>
-  <% if @thisDeal["stats"] %>
-    <% @thisDeal["stats"]["parties"].each do |thisParty| %>
+  <% if @this_deal["stats"] %>
+    <% @this_deal["stats"]["parties"].each do |thisParty| %>
       <div class="card">
         <div class="card-body">
           <h5 class="card-title"><%= thisParty["email"] %></h5>

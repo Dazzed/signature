@@ -8,7 +8,7 @@
         <a 
           href="javascript:void(0)" 
           class="list-group-item list-group-item-action flex-column align-items-start"
-          onClick="getTemplate('<%= thisTemplate[:template_id] %>', '<%= @thisDeal[:deal_id] %>')">
+          onClick="getTemplate('<%= thisTemplate[:template_id] %>', '<%= @this_deal[:deal_id] %>')">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1"><%= thisTemplate[:title] %></h5>
             <small>Total Signers: <span class="badge badge-pill badge-success"><%= thisTemplate[:signer_roles].length %></span></small>

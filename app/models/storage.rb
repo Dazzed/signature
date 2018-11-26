@@ -3,7 +3,7 @@ require "time"
 class Storage
   # deal_id (ObjectId)
   # params (Object)
-  # commonUuid (String)
+  # common_uuid (String)
   # createdAt (Date)
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic

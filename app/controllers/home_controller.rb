@@ -7,51 +7,51 @@ class HomeController < ApplicationController
   def initDealData
     # Validate deal_id
     deal_id = params[:deal_id]
-    return render 'errorPage' unless deal_id
-    @thisDeal = Storage.where(:deal_id => deal_id).first
+    return render 'error_page' unless deal_id
+    @this_deal = Storage.where(:deal_id => deal_id).first
     # If this is a new deal, Then create a new deal and assign it a common uuid
     # Also save the incoming dynamic params in the deal.
-    if @thisDeal.nil?
-      commonUuid = SecureRandom.hex
-      @thisDeal = Storage.create({
+    if @this_deal.nil?
+      common_uuid = SecureRandom.hex
+      @this_deal = Storage.create({
         :deal_id => deal_id,
         :params => params.to_json,
-        :commonUuid => commonUuid,
+        :common_uuid => common_uuid,
       })
     else
       # IF the deal record already exists, then simply update the dynamic params
-      @thisDeal.update(:params => params.to_json)
+      @this_deal.update(:params => params.to_json)
     end
     # Fetch all contracts related to this deal for display in the view.
     @contracts = Document.where(:deal_id => deal_id)
     # Fetch all templates from Hellosign that can be used for a new contract
-    templateRes = HelloSign.get_templates
-    @templates = helpers.pluckFieldsForTemplateSelection(templateRes)
+    template_list = HelloSign.get_templates
+    @templates = helpers.pluckFieldsForTemplateSelection(template_list)
   end
 
   def getFormForTemplate
     # Validate presence of templateId
     unless params[:templateId] && params[:deal_id]
-      return render 'errorPage'
+      return render 'error_page'
     end
     targetTemplate = HelloSign.get_template :template_id => params[:templateId]
     unless targetTemplate
-      return render 'errorPage'
+      return render 'error_page'
     end
     # Fetch the deal record and get the dynamic params.
-    @thisDeal = Storage.where(:deal_id => params[:deal_id]).first
-    @thisDealParams = JSON.parse(@thisDeal.params)
+    @this_deal = Storage.where(:deal_id => params[:deal_id]).first
+    @this_deal_params = JSON.parse(@this_deal.params)
     @targetTemplate = targetTemplate.data
     render json: {
       template_form: (
         render_to_string partial: 'template_form', locals: {
-          thisDeal: @thisDeal,
-          thisDealParams: @thisDealParams,
+          this_deal: @this_deal,
+          this_deal_params: @this_deal_params,
           targetTemplate:  @targetTemplate
         },
         layout: false
       ),
-      # deal_status: (render_to_string partial: 'template_status', locals: {thisDeal: @thisDeal, thisDealParams: @thisDealParams, targetTemplate:  @targetTemplate}, layout: false)
+      # deal_status: (render_to_string partial: 'template_status', locals: {this_deal: @this_deal, this_deal_params: @this_deal_params, targetTemplate:  @targetTemplate}, layout: false)
     }
   end
 
@@ -60,18 +60,18 @@ class HomeController < ApplicationController
     deal_id = params["deal_id"]
     # VALIDATIONS
     unless template_id && deal_id
-      return render 'errorPage'
+      return render 'error_page'
     end
     
-    @thisDeal = Storage.where(:deal_id => deal_id).first
-    unless @thisDeal
-      return render 'errorPage'
+    @this_deal = Storage.where(:deal_id => deal_id).first
+    unless @this_deal
+      return render 'error_page'
     end
     # END VALIDATIONS
 
     # Fetch the template from hellosign and fill in the dynamic read-only params placeholder info.
     targetTemplate = HelloSign.get_template :template_id => params[:template_id]
-    return render 'errorPage' unless targetTemplate
+    return render 'error_page' unless targetTemplate
     targetTemplateData = targetTemplate.data
     # Construct parties info to save in the newly created contract based on info from the hellosign template and form data
     parties = targetTemplateData["signer_roles"].map{ |signerRole|
@@ -89,7 +89,7 @@ class HomeController < ApplicationController
     }
     # Create a new document in database
     new_document = Document.create({
-      :storage_id => @thisDeal.id,
+      :storage_id => @this_deal.id,
       :deal_id => deal_id,
       :parties => parties,
       :template_id => template_id,
@@ -100,7 +100,14 @@ class HomeController < ApplicationController
     parties.each { |thisParty|
       if thisParty[:order] == 0
         link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{new_document.id.to_s}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
-        UserNotifierMailer.send_signature_request_email(parties, thisParty[:email], link).deliver
+        p targetTemplateData.to_json
+        document_title  = targetTemplateData["documents"].map{|d| d.data["name"]}.join(", ")
+        UserNotifierMailer.send_signature_request_email(
+          parties, 
+          thisParty[:email], 
+          link, 
+          document_title
+        ).deliver
       end
     }
 
@@ -113,17 +120,17 @@ class HomeController < ApplicationController
     order = params[:order]
     contract_id = params[:contract_id]
     unless uuid and order and contract_id
-      return render 'errorPage'
+      return render 'error_page'
     end
 
     thisContract = Document.find(contract_id)
 
     unless thisContract and !thisContract.try(:expired)
-      return render 'errorPage'
+      return render 'error_page'
     end
 
     thisPartyIndex = thisContract.parties.find_index{ |party| party["uuid"] == uuid }
-    return render 'errorPage' if thisPartyIndex.nil?
+    return render 'error_page' if thisPartyIndex.nil?
     thisParty = thisContract.parties[thisPartyIndex]
 
     # Redirect user to already signed page if he has already signed
@@ -161,15 +168,15 @@ class HomeController < ApplicationController
   end
 
   def stripe_update
-    Stripe.api_key = "sk_test_RSuK6LLUlCJZ8qLiIKV9kthb"
     token = params[:stripeToken]
 
-    charge = Stripe::Charge.create({
+    charge = StripeProcess.new({
       amount: 999,
       currency: "usd",
-      description: "Example charge",
+      description: "Charge for contract",
       source: token,
-    })
+    }).create_charge
+
     redirect_to thank_you_path
   end
 
