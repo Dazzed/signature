@@ -11,4 +11,14 @@ class UserNotifierMailer < ApplicationMailer
       :subject => document
     )
   end
+
+  def send_signed_document(file, document, email)
+    @file = file 
+    attachments["#{file}"] = File.read("public/" + file)
+    mail(
+      :to => email,
+      :subject => document
+    )
+  end
+
 end
