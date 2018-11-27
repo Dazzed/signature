@@ -1,6 +1,6 @@
 module HomeHelper
   def pluckFieldsForTemplateSelection(template_response)
-    return template_response.data["templates"].map { |thisTemplate|
+    return template_response.data["templates"].map { |template|
       template_id, 
       reusable_form_id,
       title,
@@ -9,7 +9,7 @@ module HomeHelper
       cc_roles,
       documents,
       custom_fields,
-      named_form_fields = thisTemplate.values_at(
+      named_form_fields = template.values_at(
         "template_id", "reusable_form_id", "title", "message", "signer_roles", "cc_roles", 
         "documents", "custom_fields", "named_form_fields"
       )

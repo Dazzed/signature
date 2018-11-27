@@ -1,13 +1,13 @@
 class UserNotifierMailer < ApplicationMailer
   default :from => 'admin@fundthatflip.com'
 
-  def send_signature_request_email(parties, targetEmail, link, document)
+  def send_signature_request_email(parties, target_email, link, document)
     @parties = parties
-    @targetEmail = targetEmail
+    @target_email = target_email
     @link = link
 
     mail(
-      :to => targetEmail,
+      :to => target_email,
       :subject => document
     )
   end

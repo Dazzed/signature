@@ -4,7 +4,7 @@ require "time"
 include SendGrid
 
 class HomeController < ApplicationController
-  def initDealData
+  def init_deal_data
     # Validate deal_id
     deal_id = params[:deal_id]
     return render 'error_page' unless deal_id
@@ -29,33 +29,33 @@ class HomeController < ApplicationController
     @templates = helpers.pluckFieldsForTemplateSelection(template_list)
   end
 
-  def getFormForTemplate
-    # Validate presence of templateId
-    unless params[:templateId] && params[:deal_id]
+  def get_form_for_template
+    # Validate presence of template_id
+    unless params[:template_id] && params[:deal_id]
       return render 'error_page'
     end
-    targetTemplate = HelloSign.get_template :template_id => params[:templateId]
-    unless targetTemplate
+    target_template = HelloSign.get_template :template_id => params[:template_id]
+    unless target_template
       return render 'error_page'
     end
     # Fetch the deal record and get the dynamic params.
     @this_deal = Storage.where(:deal_id => params[:deal_id]).first
     @this_deal_params = JSON.parse(@this_deal.params)
-    @targetTemplate = targetTemplate.data
+    @target_template = target_template.data
     render json: {
       template_form: (
         render_to_string partial: 'template_form', locals: {
           this_deal: @this_deal,
           this_deal_params: @this_deal_params,
-          targetTemplate:  @targetTemplate
+          target_template:  @target_template
         },
         layout: false
       ),
-      # deal_status: (render_to_string partial: 'template_status', locals: {this_deal: @this_deal, this_deal_params: @this_deal_params, targetTemplate:  @targetTemplate}, layout: false)
+      # deal_status: (render_to_string partial: 'template_status', locals: {this_deal: @this_deal, this_deal_params: @this_deal_params, target_template:  @target_template}, layout: false)
     }
   end
 
-  def emailDocumentForSignature
+  def email_document_for_signature
     template_id = params["template_id"]
     deal_id = params["deal_id"]
     # VALIDATIONS
@@ -70,51 +70,54 @@ class HomeController < ApplicationController
     # END VALIDATIONS
 
     # Fetch the template from hellosign and fill in the dynamic read-only params placeholder info.
-    targetTemplate = HelloSign.get_template :template_id => params[:template_id]
-    return render 'error_page' unless targetTemplate
-    targetTemplateData = targetTemplate.data
+    target_template = HelloSign.get_template :template_id => params[:template_id]
+    return render 'error_page' unless target_template
+    target_template_data = target_template.data
     # Construct parties info to save in the newly created contract based on info from the hellosign template and form data
-    parties = targetTemplateData["signer_roles"].map{ |signerRole|
-      thisOrder = signerRole.data["order"] # order is the signer order
+    parties = target_template_data["signer_roles"].map{ |signer_role|
+      this_order = signer_role.data["order"] # order is the signer order
       {
-        :order => thisOrder,
-        :name => signerRole.data["name"],
-        :email => params["signer_roles"][thisOrder.to_s],
-        :index => thisOrder.to_i,
+        :order => this_order,
+        :name => signer_role.data["name"],
+        :email => params["signer_roles"][this_order.to_s],
+        :index => this_order.to_i,
         :uuid => SecureRandom.hex,
         # Bool signer_roles_pay[order] from view will reveal if the signee in the order must pay.
-        :should_pay => params["signer_roles_pay"] ? params["signer_roles_pay"][thisOrder.to_s] == "true" : false,
+        :should_pay => params["signer_roles_pay"] ? params["signer_roles_pay"][this_order.to_s] == "true" : false,
         :is_pending_signature => true
       }
     }
+
+    document_title  = target_template_data["title"]
+
     # Create a new document in database
     new_document = Document.create({
       :storage_id => @this_deal.id,
       :deal_id => deal_id,
       :parties => parties,
       :template_id => template_id,
+      :document_title => document_title,
       :deal_attributes => params["custom_fields"].permit!.to_h
     })
+    document_title  = target_template_data["title"]
 
     # Send Email to relevant parties
-    parties.each { |thisParty|
-      if thisParty[:order] == 0
-        link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{new_document.id.to_s}&uuid=#{thisParty[:uuid]}&order=#{thisParty[:order]}"
-        p targetTemplateData.to_json
-        document_title  = targetTemplateData["documents"].map{|d| d.data["name"]}.join(", ")
+    parties.each { |this_party|
+      if this_party[:order] == 0
+        link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{new_document.id.to_s}&uuid=#{this_party[:uuid]}&order=#{this_party[:order]}"
         UserNotifierMailer.send_signature_request_email(
           parties, 
-          thisParty[:email], 
+          this_party[:email], 
           link, 
           document_title
         ).deliver
       end
     }
 
-    redirect_to "/init_alternate/#{deal_id}?showStatus=true"
+    redirect_to "/init_alternate/#{deal_id}?show_status=true"
   end
 
-  def initiateSignature
+  def initiate_signature
     # VALIDATIONS
     uuid = params[:uuid]
     order = params[:order]
@@ -123,35 +126,35 @@ class HomeController < ApplicationController
       return render 'error_page'
     end
 
-    thisContract = Document.find(contract_id)
+    this_contract = Document.find(contract_id)
 
-    unless thisContract and !thisContract.try(:expired)
+    unless this_contract and !this_contract.try(:expired)
       return render 'error_page'
     end
 
-    thisPartyIndex = thisContract.parties.find_index{ |party| party["uuid"] == uuid }
-    return render 'error_page' if thisPartyIndex.nil?
-    thisParty = thisContract.parties[thisPartyIndex]
+    this_party_index = this_contract.parties.find_index{ |party| party["uuid"] == uuid }
+    return render 'error_page' if this_party_index.nil?
+    this_party = this_contract.parties[this_party_index]
 
     # Redirect user to already signed page if he has already signed
-    return render 'already_signed_warning' if thisParty["is_pending_signature"] != true
+    return render 'already_signed_warning' if this_party["is_pending_signature"] != true
 
     # END VALIDATIONS
 
     embedded_request = HelloSign.create_embedded_signature_request_with_template(
       :test_mode => 1,
       :client_id => ENV["HELLO_SIGN_CLIENT_ID"],
-      :template_id => thisContract.template_id,
+      :template_id => this_contract.template_id,
       :subject => 'Test Subject',
       :message => "Signature requested at #{Time.now}",
       :signers => [
         {
-          :email_address => thisParty["email"],
-          :name => thisParty["name"],
-          :role => thisParty["name"]
+          :email_address => this_party["email"],
+          :name => this_party["name"],
+          :role => this_party["name"]
         }
       ],
-      :custom_fields => thisContract.deal_attributes.map{ |k,v| {:name => k, :value => v} },
+      :custom_fields => this_contract.deal_attributes.map{ |k,v| {:name => k, :value => v} },
       :metadata => {
         "contract_id": contract_id,
         "uuid": uuid
@@ -160,11 +163,16 @@ class HomeController < ApplicationController
 
     signature_request_id = embedded_request.data["signature_request_id"]
     # Unique signature request id for the party
-    thisContract.parties[thisPartyIndex]["signature_request_id"] = signature_request_id
-    thisContract.save!
+    this_contract.parties[this_party_index]["signature_request_id"] = signature_request_id
+    this_contract.save!
 
     @signed_url = get_sign_url(embedded_request)
-    @should_pay = thisContract.parties[thisPartyIndex]["should_pay"]
+    @should_pay = this_contract.parties[this_party_index]["should_pay"]
+    @signer_email = this_party["email"]
+  end
+
+  def view_stripe 
+    @signer_email = params[:email]
   end
 
   def stripe_update

@@ -1,15 +1,15 @@
 <div class="w-100 p-5">
   <h4>Template Status:</h4>
   <% if @this_deal["stats"] %>
-    <% @this_deal["stats"]["parties"].each do |thisParty| %>
+    <% @this_deal["stats"]["parties"].each do |this_party| %>
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title"><%= thisParty["email"] %></h5>
+          <h5 class="card-title"><%= this_party["email"] %></h5>
           <h6 class="card-subtitle mb-2 text-muted">
-            <% if thisParty["is_pending_signature"] %>
+            <% if this_party["is_pending_signature"] %>
               <span class="red">Pending Signature</span>
             <% else %>
-              <span class="green">Signed at <%= thisParty["signed_at"] %></span>
+              <span class="green">Signed at <%= this_party["signed_at"] %></span>
             <% end %>
           </h6>
           <a href="javascript:void(0)" class="card-link">View Signed Document</a>

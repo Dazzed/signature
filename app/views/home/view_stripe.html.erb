@@ -2,9 +2,10 @@
     <script
       src="https://checkout.stripe.com/checkout.js" class="stripe-button"
       data-key="pk_test_aVhgwN4lAac6ehJRpjzjJJld"
+      data-email="<%= @signer_email %>"
       data-amount="999"
       data-name="Stripe.com"
-      data-description="Example charge"
+      data-description="Charge for contract"
       data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
       data-locale="auto"
       data-zip-code="true">

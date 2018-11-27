@@ -49,14 +49,14 @@
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title"><%= "##{@contracts.length - index + 1} #{thisContract.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
-                  <% thisContract.parties.each do |thisParty| %>
+                  <% thisContract.parties.each do |this_party| %>
                     <div class="card-subtitle mb-4 text-muted">
-                      <p>Role: <%= thisParty["name"] %> (<% if thisParty["is_pending_signature"] %>
+                      <p>Role: <%= this_party["name"] %> (<% if this_party["is_pending_signature"] %>
                         <span class="red">Pending Signature</span>
                       <% else %>
-                        <span class="green">Signed at <%= thisParty["signed_at"].strftime("%m/%d/%Y %H:%M %P") %></span>
+                        <span class="green">Signed at <%= this_party["signed_at"].strftime("%m/%d/%Y %H:%M %P") %></span>
                       <% end %>)</p>
-                      <p>Email: <%= thisParty["email"] %></p>
+                      <p>Email: <%= this_party["email"] %></p>
                     </div>
                   <% end %>
                 </div>

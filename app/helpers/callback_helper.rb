@@ -5,21 +5,21 @@ module CallbackHelper
     if metadata
       contract_id = metadata["contract_id"]
       uuid = metadata["uuid"]
-      thisContract = Document.find(contract_id)
-      unless thisContract.nil?
-        allParties = thisContract.parties
-        thisPartyIndex = allParties.find_index{|party| party["signature_request_id"] == signature_request_id}
-        if thisPartyIndex
-          thisParty = allParties[thisPartyIndex]
-          thisContract.parties[thisPartyIndex]["is_pending_signature"] = false
-          thisContract.parties[thisPartyIndex]["signed_at"] = Time.now
-          thisContract.save!
+      this_contract = Document.find(contract_id)
+      unless this_contract.nil?
+        all_parties = this_contract.parties
+        this_party_index = all_parties.find_index{|party| party["signature_request_id"] == signature_request_id}
+        if this_party_index
+          this_party = all_parties[this_party_index]
+          this_contract.parties[this_party_index]["is_pending_signature"] = false
+          this_contract.parties[this_party_index]["signed_at"] = Time.now
+          this_contract.save!
 
-          if thisParty["order"] == 0
-            newParty = allParties.find{|party| party["order"] == 1}
-            return if newParty.nil?
-            link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{thisContract.id.to_s}&uuid=#{newParty["uuid"]}&order=#{newParty["order"]}"
-            UserNotifierMailer.send_signature_request_email(allParties, newParty["email"], link).deliver
+          if this_party["order"] == 0
+            new_party = all_parties.find{|party| party["order"] == 1}
+            return if new_party.nil?
+            link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{this_contract.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
+            UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, this_contract.document_title).deliver
           end
         end
       end

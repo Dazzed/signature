@@ -8,7 +8,7 @@ require "time"
 class Document
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
-  store_in collection: "contracts"
+  store_in collection: "documents"
 
   before_create :init_timestamp
 
