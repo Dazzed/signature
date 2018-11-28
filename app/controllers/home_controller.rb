@@ -67,27 +67,12 @@ class HomeController < ApplicationController
   end
 
   def initiate_signature
-    embedded_request = HelloSign.create_embedded_signature_request_with_template(
-      :test_mode => 1,
-      :client_id => ENV["HELLO_SIGN_CLIENT_ID"],
-      :template_id => @this_contract.template_id,
-      :subject => 'Test Subject',
-      :message => "Signature requested at #{Time.now}",
-      :signers => [
-        {
-          :email_address => @this_party["email"],
-          :name => @this_party["name"],
-          :role => @this_party["name"]
-        }
-      ],
-      :custom_fields => @this_contract.deal_attributes.map{ |k,v| {:name => k, :value => v} },
-      :metadata => {
-        "contract_id": params[:contract_id],
-        "uuid": params[:uuid]
-      }
-    )
+
+    #Create an embedded template request for signing.
+    embedded_request = HellosignService.new().create_embedded_signature_request_with_template(@this_contract, @this_party, params[:contract_id], params[:uuid])
 
     signature_request_id = embedded_request.data["signature_request_id"]
+    
     # Unique signature request id for the party
     @this_contract.parties[@this_party_index]["signature_request_id"] = signature_request_id
     @this_contract.save!

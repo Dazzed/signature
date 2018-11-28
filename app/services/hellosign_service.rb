@@ -60,9 +60,26 @@ class HellosignService
     }
   end
 
-  def create_embedded_signature_request_with_template
-
-    
+  def create_embedded_signature_request_with_template(contract, party, contract_id, uuid)
+    HelloSign.create_embedded_signature_request_with_template(  
+      :test_mode => 1,
+      :client_id => ENV["HELLO_SIGN_CLIENT_ID"],
+      :template_id => contract.template_id,
+      :subject => 'Test Subject',
+      :message => "Signature requested at #{Time.now}",
+      :signers => [
+        {
+          :email_address => party["email"],
+          :name => party["name"],
+          :role => party["name"]
+        }
+      ],
+      :custom_fields => contract.deal_attributes.map{ |k,v| {:name => k, :value => v} },
+      :metadata => {
+        "contract_id": contract_id,
+        "uuid": uuid
+      }
+    )    
   end
 
 end
