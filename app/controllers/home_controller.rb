@@ -11,7 +11,6 @@ class HomeController < ApplicationController
   before_action :get_active_contract, only: [:initiate_signature]
 
   def init_deal_data
-
     # If this is a new deal, Then create a new deal and assign it a common uuid
     # Also save the incoming dynamic params in the deal.
     if @this_deal.nil?
@@ -34,7 +33,7 @@ class HomeController < ApplicationController
   def get_form_for_template
     # Fetch the deal dynamic params.
     @this_deal_params = JSON.parse(@this_deal.params)
-
+    
     render json: {
       template_form: (
         render_to_string partial: 'template_form', locals: {
@@ -51,15 +50,13 @@ class HomeController < ApplicationController
     # Construct parties info to save in the newly created contract based on info from the hellosign template and form data
     parties = HellosignService.new().get_parties(@target_template, params[:signer_roles], params[:signer_roles_pay])
 
-    document_title  = @target_template["title"]
-
     # Create a new document in database
     new_document = Document.create({
       :storage_id => @this_deal.id,
       :deal_id => @this_deal.deal_id,
       :parties => parties,
       :template_id => @target_template["template_id"],
-      :document_title => document_title,
+      :document_title => @target_template["title"],
       :deal_attributes => params["custom_fields"].permit!.to_h
     })
 
@@ -67,12 +64,11 @@ class HomeController < ApplicationController
   end
 
   def initiate_signature
-
     #Create an embedded template request for signing.
     embedded_request = HellosignService.new().create_embedded_signature_request_with_template(@this_contract, @this_party, params[:contract_id], params[:uuid])
 
     signature_request_id = embedded_request.data["signature_request_id"]
-    
+
     # Unique signature request id for the party
     @this_contract.parties[@this_party_index]["signature_request_id"] = signature_request_id
     @this_contract.save!
