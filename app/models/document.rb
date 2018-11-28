@@ -13,7 +13,6 @@ class Document
   before_create :init_timestamp
   after_create :send_signing_request
 
-
   def send_signing_request
     # Send Email to relevant parties
     self.parties.each { |this_party|
@@ -27,7 +26,6 @@ class Document
         ).deliver
       end
     }
-
   end
 
   def handle_request_signed(uuid, signature_request_id)
@@ -47,7 +45,6 @@ class Document
       end
     end
   end
-
 
   def send_signed_document(uuid, signature_request_id)
     all_parties = self.parties
