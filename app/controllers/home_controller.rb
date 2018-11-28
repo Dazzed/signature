@@ -16,7 +16,7 @@ class HomeController < ApplicationController
     if @this_deal.nil?
       common_uuid = SecureRandom.hex
       @this_deal = Storage.create({
-        :deal_id => deal_id,
+        :deal_id => params[:deal_id],
         :params => params.to_json,
         :common_uuid => common_uuid,
       })
