@@ -1,5 +1,5 @@
 require 'stripe'
-class StripeProcess
+class StripeService
 
   def initialize(params)
     @token = params[:token]
