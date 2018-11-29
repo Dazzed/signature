@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   root "deal#show"
-  get '/deal/payment' => 'deal#payment', as: :deal_payment
+  get '/deal/:client_deal_id/client_payment' => 'deal#client_payment', as: :deal_client_payment
   post '/deal/payment_update' => 'deal#payment_update', as: :deal_payment_update
   get '/deal/thank_you' => 'deal#thank_you', as: :deal_thank_you
   get "/deal/show/:client_deal_id" => 'deal#show', as: :deal_show

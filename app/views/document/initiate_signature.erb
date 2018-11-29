@@ -8,7 +8,7 @@
       if (eventData.event == HelloSign.EVENT_SIGNED) {
         var should_pay = <%= @should_pay %>;
         if (should_pay) {
-          document.location = "/deal/payment?email=<%=@signer_email%>";
+          document.location = "/deal/<%= @document.deal.client_deal_id%>/client_payment?client_email=<%=@client_email%>";
         } else {
           document.location = "/deal/thank_you";
         }

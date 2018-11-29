@@ -3,11 +3,7 @@ require 'securerandom'
 
 class HellosignService
 
-  def initialize
-    
-  end
-
-  def get_templates
+  def self.get_templates
     template_list = HelloSign.get_templates
     return template_list.data["templates"].map { |template|
       template_id, 
@@ -36,7 +32,7 @@ class HellosignService
     }
   end
 
-  def get_template_data(template_id)
+  def self.get_template_data(template_id)
     target_template = HelloSign.get_template :template_id => template_id
     false unless target_template
 
@@ -44,29 +40,28 @@ class HellosignService
 
   end
 
-  def get_parties(target_template_data, signer_roles, signer_roles_pay)
+  def self.get_parties(target_template_data, signer_roles, signer_roles_pay)
     target_template_data["signer_roles"].map{ |signer_role|
-      this_order = signer_role.data["order"] # order is the signer order
+      signer_order = signer_role.data["order"] # order is the signer order
       {
-        :order => this_order,
+        :order => signer_order,
         :name => signer_role.data["name"],
-        :email => signer_roles[this_order.to_s],
-        :index => this_order.to_i,
+        :email => signer_roles[signer_order.to_s],
         :uuid => SecureRandom.hex,
         # Bool signer_roles_pay[order] from view will reveal if the signee in the order must pay.
-        :should_pay => signer_roles_pay ? signer_roles_pay[this_order.to_s] == "true" : false,
+        :should_pay => signer_roles_pay ? signer_roles_pay[signer_order.to_s] == "true" : false,
         :is_pending_signature => true
       }
     }
   end
 
-  def create_embedded_signature_request_with_template(document)
+  def self.create_embedded_signature_request_with_template(document)
     signers = []
-    document.parties.each do |this_party|
+    document.parties.each do |party|
       signers.push({
-        :email_address => this_party[:email],
-        :name => this_party[:name],
-        :role => this_party[:name]
+        :email_address => party[:email],
+        :name => party[:name],
+        :role => party[:name]
       })
     end
     HelloSign.create_embedded_signature_request_with_template(  
@@ -83,14 +78,14 @@ class HellosignService
     )    
   end
 
-  def send_signed_document(signature_request_id)
+  def self.send_signed_document(signature_request_id)
     file_bin = HelloSign.signature_request_files :signature_request_id => signature_request_id, :file_type => 'pdf'
     open("public/" + signature_request_id + ".pdf", "wb") do |file|
       file.write(file_bin)
     end
   end
 
-  def get_embedded_sign_url(sign_id)
+  def self.get_embedded_sign_url(sign_id)
     HelloSign.get_embedded_sign_url :signature_id => sign_id
   end
 

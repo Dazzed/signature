@@ -10,15 +10,15 @@ class CallbackController < ApplicationController
       signature_request_id = event["signature_request"]["signature_request_id"]
       if metadata
         document_id = metadata["document_id"]
-        this_document = Document.find(document_id)
-        unless this_document.nil?
+        document = Document.find(document_id)
+        unless document.nil?
           if event["event"]["event_type"] == SIGNATURE_REQUEST_SIGNED
             signature_id = event["event"]["event_metadata"]["related_signature_id"]
-            this_document.handle_request_signed(signature_id)
+            document.handle_request_signed(signature_id)
           end
           #send signed documents to parties
           if event["event"]["event_type"] == SIGNATURE_REQUEST_DOWNLOADABLE && event["signature_request"]["is_complete"]
-            this_document.send_signed_document(signature_request_id)
+            document.send_signed_document(signature_request_id)
           end
         end
       end

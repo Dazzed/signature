@@ -1,11 +1,12 @@
-  <form action="<%=stripe_update_path%>" method="POST">
+  <form action="<%=deal_payment_update_path%>" method="POST">
+    <input type="hidden" name="client_deal_id" value="<%= @deal.client_deal_id%>" />
     <script
       src="https://checkout.stripe.com/checkout.js" class="stripe-button"
       data-key="pk_test_aVhgwN4lAac6ehJRpjzjJJld"
-      data-email="<%= @signer_email %>"
-      data-amount="999"
-      data-name="Stripe.com"
-      data-description="Charge for document"
+      data-email="<%= @client_email %>"
+      data-amount="<%= @deal_attributes["deal_amount"]%>"
+      data-name="Fund That Flip"
+      data-description="<%= @deal_attributes["deal_title"]%>"
       data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
       data-locale="auto"
       data-zip-code="true">

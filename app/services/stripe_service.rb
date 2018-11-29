@@ -3,9 +3,7 @@ class StripeService
 
   def initialize(params)
     @token = params[:token]
-    @amount = params[:amount]
-    @description = params[:description]
-    @currency = params[:currency]
+    @deal_attributes = params[:deal_attributes]
   end
   
   def create_charge
@@ -19,7 +17,7 @@ class StripeService
 
   private
 
-  attr_reader :amount, :description, :token, :currency
+  attr_reader :deal_attributes, :token
 
   #Stripe charge service
   def external_charge_service
@@ -29,10 +27,10 @@ class StripeService
   #attributes for charge api.
   def charge_attributes
     {
-      amount: amount,
+      amount: deal_attributes["deal_amount"],
       token: token,
-      currency: currency,
-      description: description
+      currency: deal_attributes["deal_currency"],
+      description: deal_attributes["deal_title"]
     }
   end
 

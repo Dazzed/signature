@@ -1,15 +1,15 @@
 <div class="col-12">
   <form id="initiate_signing_form" action="/documents" method="post">
     <input type="text" hidden name="template_id" value="<%= @target_template["template_id"] %>">
-    <input type="text" hidden name="client_deal_id" value="<%= @this_deal["client_deal_id"] %>">
+    <input type="text" hidden name="client_deal_id" value="<%= @deal["client_deal_id"] %>">
     
     <div class="card">
       <h5 class="card-title">Signer Roles</h5>
       <% @target_template["signer_roles"].each do |signer_role| %>
         <% 
           signerEmail = proc {
-            if @this_deal_params[signer_role.data["name"]]
-            @this_deal_params[signer_role.data["name"]]
+            if @deal_params[signer_role.data["name"]]
+            @deal_params[signer_role.data["name"]]
             else
               ''
             end
@@ -41,8 +41,8 @@
       <% end %>
       <% @target_template["custom_fields"].each do |customField| %>
         <% value = proc {
-          if @this_deal_params[customField.data["name"]]
-            @this_deal_params[customField.data["name"]]
+          if @deal_params[customField.data["name"]]
+            @deal_params[customField.data["name"]]
           else
             ''
           end
@@ -52,7 +52,7 @@
           <input 
             type="text"
             class="form-control"
-            name="custom_fields[<%= customField.data["api_id"] %>]"
+            name="deal_attributes[<%= customField.data["api_id"] %>]"
             value="<%= value %>"
           >
         </div>
@@ -60,7 +60,7 @@
     </div>
     <%
       submitText = proc {
-        if @this_deal["stats"]
+        if @deal["stats"]
           'Resend'
         else
           'Submit'

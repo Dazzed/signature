@@ -8,7 +8,7 @@
         <a 
           href="javascript:void(0)" 
           class="list-group-item list-group-item-action flex-column align-items-start"
-          onClick="getTemplate('<%= template[:template_id] %>', '<%= @this_deal[:client_deal_id] %>')">
+          onClick="getTemplate('<%= template[:template_id] %>', '<%= @deal[:client_deal_id] %>')">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1"><%= template[:title] %></h5>
             <small>Total Signatories: <span class="badge badge-pill badge-success"><%= template[:signer_roles].length %></span></small>
@@ -38,13 +38,34 @@
         <a class="nav-link active" id="form-tab" data-toggle="tab" href="#form" role="tab" aria-controls="form" aria-selected="true">Deal Attributes</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link " id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false" data-deal-id="<%= @this_deal[:client_deal_id] %>">Documents Status</a>
+        <a class="nav-link " id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Documents Status</a>
       </li>
     </ul>
     <div class="tab-content" id="deal-details-content">
       <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
         <div id="document-container">
-          
+          <% if @deal.documents.length > 0 %>
+            <% @deal.documents.reverse.each.with_index do |document, index| %>
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><%= "##{@deal.documents.length - index} #{document.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
+                  <% document.parties.each do |party| %>
+                    <div class="card-subtitle mb-4 text-muted">
+                      <p>Role: <%= party["name"] %> (<% if party["is_pending_signature"] %>
+                        <span class="red">Pending Signature</span>
+                      <% else %>
+                        <span class="green">Signed at <%= party["signed_at"].strftime("%m/%d/%Y %H:%M") %></span>
+                      <% end %>)</p>
+                      <p>Email: <%= party["email"] %></p>
+                    </div>
+                  <% end %>
+                  <%= link_to "Download Signed Document", ("/" + document.parties[0]["signature_request_id"] + ".pdf"), target: "_blank" unless !document.complete %>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <p>You have not created any documents for this deal</p>
+          <% end %>          
         </div>
       </div>
       <div class="tab-pane fade show active" id="form" role="tabpanel" aria-labelledby="form-tab">

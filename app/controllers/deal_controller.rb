@@ -1,46 +1,43 @@
 require 'sendgrid-ruby'
-require 'securerandom'
 require "time"
 include SendGrid
 
 class DealController < ApplicationController
 
-  before_action :get_deal, only: [:show]
+  before_action :validate_deal_params, only: [:show, :client_payment, :payment_update]
 
   def show
-    # If this is a new deal, Then create a new deal and assign it a common uuid
+    # If this is a new deal, Then create a new deal
     # Also save the incoming dynamic params in the deal.
-    if @this_deal.nil?
-      common_uuid = SecureRandom.hex
-      @this_deal = Deal.create({
-        :client_deal_id => params[:client_deal_id],
-        :params => params.to_json,
-        :common_uuid => common_uuid,
-      })
-    else
-      # IF the deal record already exists, then simply update the dynamic params
-      @this_deal.update(:params => params.to_json)
-    end
+    @deal = Deal.find_or_create_by!(:client_deal_id => params[:client_deal_id])
+    @deal.update_attributes!(deal_attributes: params.to_json) unless !params[:show_status].nil?
     # Fetch all templates from Hellosign that can be used for a new document
-    @templates = HellosignService.new().get_templates
+    @templates = HellosignService::get_templates
 
   end
   
-  def payment 
-    @signer_email = params[:email]
+  def client_payment 
+    @deal = Deal.find_by(:client_deal_id => params[:client_deal_id])
+    @deal_attributes = JSON.parse(@deal.deal_attributes)
+    @client_email = params[:client_email]
   end
 
   def payment_update
     token = params[:stripeToken]
+    @deal = Deal.find_by(:client_deal_id => params[:client_deal_id])
+    @deal_attributes = JSON.parse(@deal.deal_attributes)
 
     charge = StripeService.new({
-      amount: 999,
-      currency: "usd",
-      description: "Charge for document",
+      deal_attributes: @deal_attributes,
       source: token,
     }).create_charge
 
     redirect_to deal_thank_you_path
   end
   
+  private
+  def validate_deal_params
+    client_deal_id = params[:client_deal_id]
+    return render 'error/error_page' unless client_deal_id    
+  end
 end
