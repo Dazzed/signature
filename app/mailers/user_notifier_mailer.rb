@@ -12,7 +12,7 @@ class UserNotifierMailer < ApplicationMailer
     )
   end
 
-  def send_signed_document(file, document, email)
+  def email_signed_document(file, document, email)
     @file = file 
     attachments["#{file}"] = File.read("public/" + file)
     mail(
