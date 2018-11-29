@@ -15,8 +15,8 @@ class HomeController < ApplicationController
     # Also save the incoming dynamic params in the deal.
     if @this_deal.nil?
       common_uuid = SecureRandom.hex
-      @this_deal = Storage.create({
-        :deal_id => params[:deal_id],
+      @this_deal = Deal.create({
+        :client_deal_id => params[:client_deal_id],
         :params => params.to_json,
         :common_uuid => common_uuid,
       })
@@ -25,7 +25,7 @@ class HomeController < ApplicationController
       @this_deal.update(:params => params.to_json)
     end
     # Fetch all contracts related to this deal for display in the view.
-    @contracts = Document.where(:deal_id => @this_deal.deal_id)
+    @contracts = Document.where(:deal_id => @this_deal.id)
     # Fetch all templates from Hellosign that can be used for a new contract
     @templates = HellosignService.new().get_templates
   end
@@ -33,17 +33,7 @@ class HomeController < ApplicationController
   def get_form_for_template
     # Fetch the deal dynamic params.
     @this_deal_params = JSON.parse(@this_deal.params)
-    
-    render json: {
-      template_form: (
-        render_to_string partial: 'template_form', locals: {
-          this_deal: @this_deal,
-          this_deal_params: @this_deal_params,
-          target_template:  @target_template
-        },
-        layout: false
-      ),
-    }
+    render :layout => false
   end
 
   def email_document_for_signature
@@ -52,15 +42,15 @@ class HomeController < ApplicationController
 
     # Create a new document in database
     new_document = Document.create({
-      :storage_id => @this_deal.id,
-      :deal_id => @this_deal.deal_id,
+      :deal_id => @this_deal.id,
+      :client_deal_id => @this_deal.client_deal_id,
       :parties => parties,
       :template_id => @target_template["template_id"],
       :document_title => @target_template["title"],
       :deal_attributes => params["custom_fields"].permit!.to_h
     })
 
-    redirect_to "/init_alternate/#{@this_deal.deal_id}?show_status=true"
+    redirect_to "/init_alternate/#{@this_deal.client_deal_id}?show_status=true"
   end
 
   def initiate_signature
@@ -109,9 +99,9 @@ class HomeController < ApplicationController
   end
 
   def get_deal
-    deal_id = params[:deal_id]
-    return render 'error_page' unless deal_id
-    @this_deal = Storage.where(:deal_id => deal_id).first
+    client_deal_id = params[:client_deal_id]
+    return render 'error_page' unless client_deal_id
+    @this_deal = Deal.where(:client_deal_id => client_deal_id).first
   end
 
   def get_template_data

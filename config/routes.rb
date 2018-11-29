@@ -10,5 +10,5 @@ Rails.application.routes.draw do
 
   post '/callbacks', to: 'callback#hello_sign_callback', as: 'hellosign_callback'
 
-  get "/init_alternate/:deal_id" => 'home#init_deal_data', as: :init_alternate
+  get "/init_alternate/:client_deal_id" => 'home#init_deal_data', as: :init_alternate
 end

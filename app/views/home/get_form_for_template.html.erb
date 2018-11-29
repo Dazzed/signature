@@ -1,7 +1,7 @@
 <div class="col-12">
   <form id="initiate_signing_form" action="/send_emails" method="post">
     <input type="text" hidden name="template_id" value="<%= @target_template["template_id"] %>">
-    <input type="text" hidden name="deal_id" value="<%= @this_deal["deal_id"] %>">
+    <input type="text" hidden name="client_deal_id" value="<%= @this_deal["client_deal_id"] %>">
     
     <div class="card">
       <h5 class="card-title">Signer Roles</h5>

@@ -1,9 +1,8 @@
-function getTemplate(template_id, dealId) {
+function getTemplate(template_id, deal_id) {
   $.ajax({
-    url: '/get_form?template_id=' + template_id + '&deal_id=' + dealId,
+    url: '/get_form?template_id=' + template_id + '&client_deal_id=' + deal_id,
     success: function(data) {
-      console.log(5, data);
-      $('#form-container').html(data.template_form);
+      $('#form-container').html(data);
     },
     error: function (err) {
       console.log('Error in getTemplate');
