@@ -70,7 +70,7 @@ class DocumentController < ApplicationController
       return render 'error/error_page'
     end
 
-    @document = Document.find_by(document_id: document_id)
+    @document = Document.find(document_id)
     unless @document and !@document.try(:expired)
       return render 'error/error_page'
     end
