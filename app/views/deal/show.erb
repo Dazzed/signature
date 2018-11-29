@@ -1,0 +1,55 @@
+<div class="row p-4">
+  <div class="col-md-6">
+    <div class="text-center">
+      <h3>Select A Template <span class="badge badge-secondary"><%= @templates.length %></span></h3>
+    </div>
+    <div class="list-group">
+      <% @templates.each do |template| %>
+        <a 
+          href="javascript:void(0)" 
+          class="list-group-item list-group-item-action flex-column align-items-start"
+          onClick="getTemplate('<%= template[:template_id] %>', '<%= @this_deal[:client_deal_id] %>')">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1"><%= template[:title] %></h5>
+            <small>Total Signatories: <span class="badge badge-pill badge-success"><%= template[:signer_roles].length %></span></small>
+          </div>
+          <p class="mb-1 deal-message"><%= template[:message] %></p>
+          <div class="d-flex w-100 justify-content-evenly">
+            <span class="signers-label">Signatories: &nbsp; </span> 
+            <% template[:signer_roles].map do |d| %> 
+              <span class="signers badge badge-pill badge-info"><%= d["name"] %></span>
+            <% end %>
+          </div>
+          <small>Document: 
+            <%= template[:documents]
+              .map{|d| d["name"]}
+              .join(", ") 
+            %>
+          </small>
+        </a>
+      <% end %>
+    </div>
+  </div>
+  <br />
+  <br />
+  <div class="col-md-6" id="stats-container">
+    <ul class="nav nav-tabs" id="deal-details-tab" role="tablist">
+      <li class="nav-item ">
+        <a class="nav-link active" id="form-tab" data-toggle="tab" href="#form" role="tab" aria-controls="form" aria-selected="true">Deal Attributes</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link " id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false" data-deal-id="<%= @this_deal[:client_deal_id] %>">Documents Status</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="deal-details-content">
+      <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
+        <div id="document-container">
+          
+        </div>
+      </div>
+      <div class="tab-pane fade show active" id="form" role="tabpanel" aria-labelledby="form-tab">
+        <div class="row p-4" id="form-container"></div>
+      </div>
+    </div>
+  </div>
+</div>

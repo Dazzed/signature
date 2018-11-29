@@ -48,18 +48,19 @@ class Document
   end
 
   def send_signing_request
-    # Send Email to relevant parties
-
+    # create an embedded request for signature
     document = self
     embedded_request = HellosignService.new().create_embedded_signature_request_with_template(document)
     signature_request_id = embedded_request.data["signature_request_id"]
 
+    #update the signature_id and signature_request_id on document.
     self.parties.each_with_index do |party, i|
       self.parties[i]["signature_request_id"] = signature_request_id
       self.parties[i]["signature_id"] = embedded_request.signatures[i].signature_id
     end
     self.save!
 
+    #email the first person to sign the document
     self.parties.each { |this_party|
       if this_party[:order] == 0
         link = "#{ENV['EMAIL_SIGNING_URL']}?document_id=#{self.id.to_s}&uuid=#{this_party[:uuid]}&order=#{this_party[:order]}"

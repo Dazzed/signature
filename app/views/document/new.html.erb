@@ -1,0 +1,72 @@
+<div class="col-12">
+  <form id="initiate_signing_form" action="/documents" method="post">
+    <input type="text" hidden name="template_id" value="<%= @target_template["template_id"] %>">
+    <input type="text" hidden name="client_deal_id" value="<%= @this_deal["client_deal_id"] %>">
+    
+    <div class="card">
+      <h5 class="card-title">Signer Roles</h5>
+      <% @target_template["signer_roles"].each do |signer_role| %>
+        <% 
+          signerEmail = proc {
+            if @this_deal_params[signer_role.data["name"]]
+            @this_deal_params[signer_role.data["name"]]
+            else
+              ''
+            end
+          }.call
+        %>
+        <div class="form-group">
+          <label><%= signer_role.data["name"] %> Email:</label>
+          <input
+            type="text"
+            class="form-control"
+            name="signer_roles[<%= signer_role.data["order"] %>]"
+            value="<%= signerEmail %>" />
+          <div class="form-check">
+            <label class="form-check-label">
+              <input 
+                type="checkbox"
+                class="form-check-input"
+                value="true" 
+                name="signer_roles_pay[<%= signer_role.data["order"] %>]"
+              >Is Payee
+            </label>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <div class="card">
+      <% if @target_template["custom_fields"].count > 0 %>
+        <h5>Custom Fields</h5>
+      <% end %>
+      <% @target_template["custom_fields"].each do |customField| %>
+        <% value = proc {
+          if @this_deal_params[customField.data["name"]]
+            @this_deal_params[customField.data["name"]]
+          else
+            ''
+          end
+        }.call %>
+        <div class="form-group">
+          <label><%= customField.data["name"] %>:</label>
+          <input 
+            type="text"
+            class="form-control"
+            name="custom_fields[<%= customField.data["api_id"] %>]"
+            value="<%= value %>"
+          >
+        </div>
+      <% end %>
+    </div>
+    <%
+      submitText = proc {
+        if @this_deal["stats"]
+          'Resend'
+        else
+          'Submit'
+        end
+      }.call
+    %>
+    <button type="submit" class="btn btn-primary"><%= submitText %></button>
+  </form>
+</div>
