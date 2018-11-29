@@ -78,7 +78,7 @@ class HellosignService
     )    
   end
 
-  def self.send_signed_document(signature_request_id)
+  def self.store_signed_document(signature_request_id)
     file_bin = HelloSign.signature_request_files :signature_request_id => signature_request_id, :file_type => 'pdf'
     open("public/" + signature_request_id + ".pdf", "wb") do |file|
       file.write(file_bin)

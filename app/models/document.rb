@@ -35,7 +35,7 @@ class Document
 
   def send_signed_document(signature_request_id)
     all_parties = self.parties
-    HellosignService::send_signed_document(signature_request_id)
+    HellosignService::store_signed_document(signature_request_id)
     all_parties.each do |party|
       UserNotifierMailer.send_signed_document(signature_request_id + '.pdf', self.document_title, party["email"]).deliver
     end
