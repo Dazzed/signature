@@ -38,18 +38,18 @@
         <a class="nav-link active" id="form-tab" data-toggle="tab" href="#form" role="tab" aria-controls="form" aria-selected="true">Deal Attributes</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link " id="contracts-tab" data-toggle="tab" href="#contracts" role="tab" aria-controls="contracts" aria-selected="false">Documents Status</a>
+        <a class="nav-link " id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Documents Status</a>
       </li>
     </ul>
     <div class="tab-content" id="deal-details-content">
-      <div class="tab-pane fade" id="contracts" role="tabpanel" aria-labelledby="contracts-tab">
+      <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
         <div class="">
-          <% if @contracts.length > 0 %>
-            <% @contracts.reverse.each.with_index do |contract, index| %>
+          <% if @documents.length > 0 %>
+            <% @documents.reverse.each.with_index do |document, index| %>
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title"><%= "##{@contracts.length - index} #{contract.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
-                  <% contract.parties.each do |party| %>
+                  <h5 class="card-title"><%= "##{@documents.length - index} #{document.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
+                  <% document.parties.each do |party| %>
                     <div class="card-subtitle mb-4 text-muted">
                       <p>Role: <%= party["name"] %> (<% if party["is_pending_signature"] %>
                         <span class="red">Pending Signature</span>
@@ -59,12 +59,12 @@
                       <p>Email: <%= party["email"] %></p>
                     </div>
                   <% end %>
-                  <%= link_to "Download Signed Document", ("/" + contract.parties[0]["signature_request_id"] + ".pdf"), target: "_blank" unless !contract.complete %>
+                  <%= link_to "Download Signed Document", ("/" + document.parties[0]["signature_request_id"] + ".pdf"), target: "_blank" unless !document.complete %>
                 </div>
               </div>
             <% end %>
           <% else %>
-            <p>You have not created any contracts for this deal</p>
+            <p>You have not created any documents for this deal</p>
           <% end %>
         </div>
       </div>

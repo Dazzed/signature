@@ -25,7 +25,7 @@ class Document
       if this_party["order"] == 0
         new_party = all_parties.find{|party| party["order"] == 1}
         return if new_party.nil?
-        link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
+        link = "#{ENV['EMAIL_SIGNING_URL']}?document_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
         UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, self.document_title).deliver
       end
     end
@@ -62,7 +62,7 @@ class Document
 
     self.parties.each { |this_party|
       if this_party[:order] == 0
-        link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{self.id.to_s}&uuid=#{this_party[:uuid]}&order=#{this_party[:order]}"
+        link = "#{ENV['EMAIL_SIGNING_URL']}?document_id=#{self.id.to_s}&uuid=#{this_party[:uuid]}&order=#{this_party[:order]}"
         UserNotifierMailer.send_signature_request_email(
           self.parties, 
           this_party[:email], 
