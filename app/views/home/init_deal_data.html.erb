@@ -4,24 +4,24 @@
       <h3>Select A Template <span class="badge badge-secondary"><%= @templates.length %></span></h3>
     </div>
     <div class="list-group">
-      <% @templates.each do |thisTemplate| %>
+      <% @templates.each do |template| %>
         <a 
           href="javascript:void(0)" 
           class="list-group-item list-group-item-action flex-column align-items-start"
-          onClick="getTemplate('<%= thisTemplate[:template_id] %>', '<%= @this_deal[:client_deal_id] %>')">
+          onClick="getTemplate('<%= template[:template_id] %>', '<%= @this_deal[:client_deal_id] %>')">
           <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1"><%= thisTemplate[:title] %></h5>
-            <small>Total Signers: <span class="badge badge-pill badge-success"><%= thisTemplate[:signer_roles].length %></span></small>
+            <h5 class="mb-1"><%= template[:title] %></h5>
+            <small>Total Signatories: <span class="badge badge-pill badge-success"><%= template[:signer_roles].length %></span></small>
           </div>
-          <p class="mb-1 deal-message"><%= thisTemplate[:message] %></p>
+          <p class="mb-1 deal-message"><%= template[:message] %></p>
           <div class="d-flex w-100 justify-content-evenly">
             <span class="signers-label">Signatories: &nbsp; </span> 
-            <% thisTemplate[:signer_roles].map do |d| %> 
+            <% template[:signer_roles].map do |d| %> 
               <span class="signers badge badge-pill badge-info"><%= d["name"] %></span>
             <% end %>
           </div>
           <small>Document: 
-            <%= thisTemplate[:documents]
+            <%= template[:documents]
               .map{|d| d["name"]}
               .join(", ") 
             %>
@@ -45,20 +45,21 @@
       <div class="tab-pane fade" id="contracts" role="tabpanel" aria-labelledby="contracts-tab">
         <div class="">
           <% if @contracts.length > 0 %>
-            <% @contracts.reverse.each.with_index do |thisContract, index| %>
+            <% @contracts.reverse.each.with_index do |contract, index| %>
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title"><%= "##{@contracts.length - index} #{thisContract.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
-                  <% thisContract.parties.each do |this_party| %>
+                  <h5 class="card-title"><%= "##{@contracts.length - index} #{contract.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
+                  <% contract.parties.each do |party| %>
                     <div class="card-subtitle mb-4 text-muted">
-                      <p>Role: <%= this_party["name"] %> (<% if this_party["is_pending_signature"] %>
+                      <p>Role: <%= party["name"] %> (<% if party["is_pending_signature"] %>
                         <span class="red">Pending Signature</span>
                       <% else %>
-                        <span class="green">Signed at <%= this_party["signed_at"].strftime("%m/%d/%Y %H:%M") %></span>
+                        <span class="green">Signed at <%= party["signed_at"].strftime("%m/%d/%Y %H:%M") %></span>
                       <% end %>)</p>
-                      <p>Email: <%= this_party["email"] %></p>
+                      <p>Email: <%= party["email"] %></p>
                     </div>
                   <% end %>
+                  <%= link_to "Download Signed Document", ("/" + contract.parties[0]["signature_request_id"] + ".pdf"), target: "_blank" unless !contract.complete %>
                 </div>
               </div>
             <% end %>

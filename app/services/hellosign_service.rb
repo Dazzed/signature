@@ -60,33 +60,38 @@ class HellosignService
     }
   end
 
-  def create_embedded_signature_request_with_template(contract, party, contract_id, uuid)
+  def create_embedded_signature_request_with_template(contract)
+    signers = []
+    contract.parties.each do |this_party|
+      signers.push({
+        :email_address => this_party[:email],
+        :name => this_party[:name],
+        :role => this_party[:name]
+      })
+    end
     HelloSign.create_embedded_signature_request_with_template(  
       :test_mode => 1,
       :client_id => ENV["HELLO_SIGN_CLIENT_ID"],
       :template_id => contract.template_id,
       :subject => 'Test Subject',
       :message => "Signature requested at #{Time.now}",
-      :signers => [
-        {
-          :email_address => party["email"],
-          :name => party["name"],
-          :role => party["name"]
-        }
-      ],
+      :signers => signers,
       :custom_fields => contract.deal_attributes.map{ |k,v| {:name => k, :value => v} },
       :metadata => {
-        "contract_id": contract_id,
-        "uuid": uuid
+        "contract_id": contract.id
       }
     )    
   end
 
-  def send_signed_document(signature_request_id, uuid)
+  def send_signed_document(signature_request_id)
     file_bin = HelloSign.signature_request_files :signature_request_id => signature_request_id, :file_type => 'pdf'
-    open("public/" + uuid + ".pdf", "wb") do |file|
+    open("public/" + signature_request_id + ".pdf", "wb") do |file|
       file.write(file_bin)
     end
+  end
+
+  def get_embedded_sign_url(sign_id)
+    HelloSign.get_embedded_sign_url :signature_id => sign_id
   end
 
 end

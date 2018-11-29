@@ -13,9 +13,9 @@ class Document
   before_create :init_timestamp
   after_create :send_signing_request
 
-  def handle_request_signed(uuid, signature_request_id)
+  def handle_request_signed(signature_id)
     all_parties = self.parties
-    this_party_index = all_parties.find_index{|party| party["signature_request_id"] == signature_request_id}
+    this_party_index = all_parties.find_index{|party| party["signature_id"] == signature_id}
     if this_party_index
       this_party = all_parties[this_party_index]
       self.parties[this_party_index]["is_pending_signature"] = false
@@ -31,18 +31,14 @@ class Document
     end
   end
 
-  def send_signed_document(uuid, signature_request_id)
+  def send_signed_document(signature_request_id)
     all_parties = self.parties
-    this_party_index = all_parties.find_index{|party| party["signature_request_id"] == signature_request_id}
-    if this_party_index
-      this_party = all_parties[this_party_index]
-      if this_party["order"] == 1
-        HellosignService.new().send_signed_document(signature_request_id, uuid)
-        all_parties.each do |party|
-          UserNotifierMailer.send_signed_document(uuid + '.pdf', self.document_title, party["email"]).deliver
-        end
-      end
+    HellosignService.new().send_signed_document(signature_request_id)
+    all_parties.each do |party|
+      UserNotifierMailer.send_signed_document(signature_request_id + '.pdf', self.document_title, party["email"]).deliver
     end
+    self.complete = true
+    self.save!
   end
 
   private
@@ -53,6 +49,17 @@ class Document
 
   def send_signing_request
     # Send Email to relevant parties
+
+    document = self
+    embedded_request = HellosignService.new().create_embedded_signature_request_with_template(document)
+    signature_request_id = embedded_request.data["signature_request_id"]
+
+    self.parties.each_with_index do |party, i|
+      self.parties[i]["signature_request_id"] = signature_request_id
+      self.parties[i]["signature_id"] = embedded_request.signatures[i].signature_id
+    end
+    self.save!
+
     self.parties.each { |this_party|
       if this_party[:order] == 0
         link = "#{ENV['EMAIL_SIGNING_URL']}?contract_id=#{self.id.to_s}&uuid=#{this_party[:uuid]}&order=#{this_party[:order]}"
@@ -65,6 +72,5 @@ class Document
       end
     }
   end
-
 
 end

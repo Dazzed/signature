@@ -47,7 +47,8 @@ class HomeController < ApplicationController
       :parties => parties,
       :template_id => @target_template["template_id"],
       :document_title => @target_template["title"],
-      :deal_attributes => params["custom_fields"].permit!.to_h
+      :deal_attributes => params["custom_fields"].permit!.to_h,
+      :complete => false
     })
 
     redirect_to "/init_alternate/#{@this_deal.client_deal_id}?show_status=true"
@@ -55,15 +56,7 @@ class HomeController < ApplicationController
 
   def initiate_signature
     #Create an embedded template request for signing.
-    embedded_request = HellosignService.new().create_embedded_signature_request_with_template(@this_contract, @this_party, params[:contract_id], params[:uuid])
-
-    signature_request_id = embedded_request.data["signature_request_id"]
-
-    # Unique signature request id for the party
-    @this_contract.parties[@this_party_index]["signature_request_id"] = signature_request_id
-    @this_contract.save!
-
-    @signed_url = get_sign_url(embedded_request)
+    @signed_url = HellosignService.new().get_embedded_sign_url(@this_contract.parties[@this_party_index][:signature_id])
     @should_pay = @this_contract.parties[@this_party_index]["should_pay"]
     @signer_email = @this_party["email"]
   end
@@ -85,19 +78,7 @@ class HomeController < ApplicationController
     redirect_to thank_you_path
   end
 
-  def success
-  end
-
   private
-  def get_sign_url(embedded_request)
-    sign_id = get_first_signature_id(embedded_request)
-    HelloSign.get_embedded_sign_url :signature_id => sign_id
-  end
-
-  def get_first_signature_id(embedded_request)
-    embedded_request.signatures[0].signature_id
-  end
-
   def get_deal
     client_deal_id = params[:client_deal_id]
     return render 'error_page' unless client_deal_id
@@ -131,7 +112,6 @@ class HomeController < ApplicationController
       return render 'error_page'
     end
 
-    # VALIDATIONS
     @this_contract = Document.find(contract_id)
 
     unless @this_contract and !@this_contract.try(:expired)
@@ -144,9 +124,6 @@ class HomeController < ApplicationController
 
     # Redirect user to already signed page if he has already signed
     return render 'already_signed_warning' if @this_party["is_pending_signature"] != true
-
-    # END VALIDATIONS
-
   end
 
 end
