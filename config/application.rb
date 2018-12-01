@@ -15,7 +15,7 @@ module HelloSign
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
-
+    config.active_job.queue_adapter = :sidekiq
     config.before_configuration do
       if ENV["RAILS_ENV"] != "production"
         env_file = File.join(Rails.root, "config", "local_env.yml")
