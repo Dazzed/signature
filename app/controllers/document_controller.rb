@@ -8,6 +8,8 @@ class DocumentController < ApplicationController
   before_action :get_template_data, only: [:new, :create]
   before_action :validate_signature_params, only: [:initiate_signature]
   before_action :get_active_document, only: [:initiate_signature]
+  before_action :get_signer_information, only: [:initiate_signature]
+  
 
   def new
     @deal_params = JSON.parse(@deal.deal_attributes)
@@ -74,7 +76,9 @@ class DocumentController < ApplicationController
     unless @document and !@document.try(:expired)
       return render 'error/error_page'
     end
+  end
 
+  def get_signer_information
     @party_index = @document.parties.find_index{ |party| party["uuid"] == params[:uuid] }
     return render 'error/error_page' if @party_index.nil?
     @party = @document.parties[@party_index]

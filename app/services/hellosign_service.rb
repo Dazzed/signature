@@ -16,8 +16,7 @@ class HellosignService
       custom_fields,
       named_form_fields = template.values_at(
         "template_id", "reusable_form_id", "title", "message", "signer_roles", "cc_roles", 
-        "documents", "custom_fields", "named_form_fields"
-      )
+        "documents", "custom_fields", "named_form_fields") 
       {
         :template_id => template_id, 
         :reusable_form_id => reusable_form_id,

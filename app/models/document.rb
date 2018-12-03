@@ -23,16 +23,19 @@ class Document
       self.parties[party_index]["is_pending_signature"] = false
       self.parties[party_index]["signed_at"] = Time.now
       self.save!
-
-      if party["order"] == 0
-        new_party = all_parties.find{|party| party["order"] == 1}
-        return if new_party.nil?
-        link = "#{ENV['EMAIL_SIGNING_URL']}?document_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
-        UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, self.document_title).deliver
-      end
+      self.email_next_party(party)
     end
   end
 
+  def email_next_party(party)
+    all_parties = self.parties
+    if party["order"] == 0
+      new_party = all_parties.find{|party| party["order"] == 1}
+      return if new_party.nil?
+      link = "#{ENV['EMAIL_SIGNING_URL']}?document_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
+      UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, self.document_title).deliver
+    end
+  end
   def send_signed_document(signature_request_id)
     all_parties = self.parties
     HellosignService::store_signed_document(signature_request_id)
