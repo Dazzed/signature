@@ -1,6 +1,6 @@
 function getTemplate(template_id, deal_id) {
   $.ajax({
-    url: '/document/new?template_id=' + template_id + '&client_deal_id=' + deal_id,
+    url: '/documents/new?template_id=' + template_id + '&client_deal_id=' + deal_id,
     success: function (data) {
       $('#form-container').html(data);
     },
@@ -11,7 +11,7 @@ function getTemplate(template_id, deal_id) {
 }
 
 $(function () {
-  if (location.pathname.indexOf('deal/show') !== -1) {
+  if (location.pathname.indexOf('deals/') !== -1) {
     $('#deal-details-tab li:nth-child(2) a').tab('show');
   }
 });

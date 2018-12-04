@@ -1,12 +1,12 @@
 SIGNATURE_REQUEST_SIGNED = 'signature_request_signed'
 SIGNATURE_REQUEST_DOWNLOADABLE = 'signature_request_downloadable'
 
-class CallbackController < ApplicationController
+class Callbacks::HellosignController < ApplicationController
   before_action :validate_callback_event_type
   before_action :validate_callback_metadata
   before_action :validate_document
 
-  def hello_sign_callback
+  def create
     signature_request_id = @event["signature_request"]["signature_request_id"]
     if @event["event"]["event_type"] == SIGNATURE_REQUEST_SIGNED
       signature_id = @event["event"]["event_metadata"]["related_signature_id"]
