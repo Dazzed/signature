@@ -22,7 +22,7 @@ class DocumentsController < ApplicationController
       :complete => false
     })
 
-    redirect_to "/deals?client_deal_id=#{@deal.client_deal_id}&show_status=true"
+    redirect_to deals_path + "?client_deal_id=#{@deal.client_deal_id}&show_status=true"
   end
 
   private
