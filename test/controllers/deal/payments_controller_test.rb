@@ -2,6 +2,8 @@ require 'test_helper'
 
 class PaymentsControllerTest < ActionDispatch::IntegrationTest
   test "New Deal Payment" do
+    get deals_url, params: {"client_deal_id"=>"_12345abcde", "IsAvailable"=>"Full Time available", "Actual Job Description"=>"Senior React JS Developer", "Validity date"=>"Upto April 2019", "Manager"=>"niraj.bothra@gmail.com", "Client"=>"sameep.dev@gmail.com", "deal_amount"=>"1000", "deal_title"=>"First Deal", "deal_currency"=>"USD"}
+
     get new_deal_payment_url, params: { :client_deal_id => "_12345abcde", :client_email => "niraj.bothra@gmail.com"}
     assert_response :success
   end
