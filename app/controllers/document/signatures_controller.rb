@@ -16,7 +16,7 @@ class Document::SignaturesController < ApplicationController
     uuid = params[:uuid]
     order = params[:order]
     unless uuid and order
-      return render 'error_page'
+      return render 'error/error_page'
     end
   end
 
