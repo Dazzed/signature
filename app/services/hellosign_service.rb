@@ -84,6 +84,10 @@ class HellosignService
     end
   end
 
+  def self.signature_request_files(signature_request_id)
+    HelloSign.signature_request_files :signature_request_id => signature_request_id, :file_type => 'pdf'
+  end
+
   def self.get_embedded_sign_url(sign_id)
     HelloSign.get_embedded_sign_url :signature_id => sign_id
   end

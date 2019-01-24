@@ -1,14 +1,21 @@
+require 'open-uri'
 class Document::SignaturesController < ApplicationController
   
   before_action :validate_signature_params, only: [:new]
   before_action :get_active_document, only: [:new]
   before_action :get_signer_information, only: [:new]
+  before_action :validate_signature_request_id, only: [:show]
 
   def new
     #Create an embedded template request for signing.
     @signed_url = HellosignService::get_embedded_sign_url(@document.parties[@party_index][:signature_id])
     @should_pay = @document.parties[@party_index]["should_pay"]
     @client_email = @party["email"]
+  end
+
+  def show
+    file_bin = HellosignService::signature_request_files(@signature_request_id)
+    send_data file_bin, :disposition => 'attachment', :filename=>"signedDocument.pdf"
   end
 
   private
@@ -40,5 +47,10 @@ class Document::SignaturesController < ApplicationController
     # Redirect user to already signed page if he has already signed
     return render 'error/already_signed_warning' if @party["is_pending_signature"] != true
   end  
+
+  def validate_signature_request_id
+    @signature_request_id = params[:id]
+    return render 'error/error_page' if @signature_request_id.nil?
+  end
 
 end
