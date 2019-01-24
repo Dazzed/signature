@@ -1,0 +1,8 @@
+<div class="card-subtitle mb-4 text-muted">
+  <p>Role: <%= party["name"] %> (<% if party["is_pending_signature"] %>
+    <span class="red">Pending Signature</span>
+  <% else %>
+    <span class="green">Signed at <%= party["signed_at"].strftime("%m/%d/%Y %H:%M") %></span>
+  <% end %>)</p>
+  <p>Email: <%= party["email"] %></p>
+</div>

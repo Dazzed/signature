@@ -1,0 +1,22 @@
+<a 
+  href="javascript:void(0)" 
+  class="list-group-item list-group-item-action flex-column align-items-start"
+  onClick="getTemplate('<%= template[:template_id] %>', '<%= deal[:client_deal_id] %>')">
+  <div class="d-flex w-100 justify-content-between">
+    <h5 class="mb-1"><%= template[:title] %></h5>
+    <small>Total Signatories: <span class="badge badge-pill badge-success"><%= template[:signer_roles].length %></span></small>
+  </div>
+  <p class="mb-1 deal-message"><%= template[:message] %></p>
+  <div class="d-flex w-100 justify-content-evenly">
+    <span class="signers-label">Signatories: &nbsp; </span> 
+    <% template[:signer_roles].map do |d| %> 
+      <span class="signers badge badge-pill badge-info"><%= d["name"] %></span>
+    <% end %>
+  </div>
+  <small>Document: 
+    <%= template[:documents]
+      .map{|d| d["name"]}
+      .join(", ") 
+    %>
+  </small>
+</a>
