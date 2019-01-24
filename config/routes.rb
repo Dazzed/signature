@@ -3,13 +3,17 @@ Rails.application.routes.draw do
   resources :deals, only: :index
   resources :documents, only: [:new, :create, :index]
 
+  namespace :api do 
+    resources :document_status, only: [:index]
+  end
+
   namespace :deal do
     resources :payments, only: [:new, :create]
     resources :payment_thanks, only: :index
   end
 
   namespace :document do
-    resources :signatures, only: [:new]
+    resources :signatures, only: [:new, :show]
     resources :signature_thanks, only: :index
   end
 
