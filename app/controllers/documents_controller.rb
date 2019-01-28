@@ -41,6 +41,12 @@ class DocumentsController < ApplicationController
     unless @target_template
       return render 'error/error_page'
     end
+
+    @target_template["signer_roles"].each do |signer_role|
+      if signer_role.data["order"].nil?
+        return render 'error/error_page'
+      end
+    end
   end
 
 end
