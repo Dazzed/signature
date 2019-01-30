@@ -1,6 +1,6 @@
 <div class="card">
   <div class="card-body">
-    <h5 class="card-title"><%= "##{total_documents - index} #{document.createdAt.strftime("%b, %d, %H:%M:%S")}"%></h5>
+    <h5 class="card-title"><%= "##{total_documents - index} #{document.createdAt.in_time_zone("US/Eastern").strftime("%b, %d, %H:%M:%S %Z")}"%></h5>
     <% document.parties.each do |party| %>
       <%= render '/documents/party_signature_status', :party => party %>
     <% end %>

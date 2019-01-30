@@ -11,7 +11,8 @@ function getTemplate(template_id, deal_id) {
 }
 
 $(function () {
-  if (location.pathname.indexOf('deals/') !== -1) {
+  console.log(location.pathname);
+  if (location.pathname.indexOf('/deals') !== -1) {
     $('#deal-details-tab li:nth-child(2) a').tab('show');
   }
 });
