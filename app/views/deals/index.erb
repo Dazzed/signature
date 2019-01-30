@@ -38,3 +38,10 @@
     </div>
   </div>
 </div>
+<script type="text/javascript">
+  $(function () {
+    <% if @templates.length > 0 %>
+      getTemplate('<%= @templates[0][:template_id] %>', '<%= @deal[:client_deal_id] %>');
+    <% end %>
+  });
+</script>

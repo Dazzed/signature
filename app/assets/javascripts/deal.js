@@ -8,10 +8,11 @@ function getTemplate(template_id, deal_id) {
       console.log('Error in getTemplate');
     }
   })
+  $(".list-group-item").removeClass("list-group-item-active");
+  $(".list-group").find("a[data-template_id='" + template_id + "']").addClass("list-group-item-active"); 
 }
 
 $(function () {
-  console.log(location.pathname);
   if (location.pathname.indexOf('/deals') !== -1) {
     $('#deal-details-tab li:nth-child(2) a').tab('show');
   }

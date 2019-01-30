@@ -56,7 +56,9 @@ label {
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.04), 0 2px 2px 0 rgba(0, 0, 0, 0.08);
   margin: 10px 0;
 }
-
+.list-group-item-active {
+  background-color: #f8f9fa;
+}
 .deal-message {
   color: lighten(#000000, 0.5);
   font-size: 0.8em;
