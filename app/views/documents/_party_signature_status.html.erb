@@ -2,7 +2,7 @@
   <p>Role: <%= party["name"] %> (<% if party["is_pending_signature"] %>
     <span class="red">Pending Signature</span>
   <% else %>
-    <span class="green">Signed at <%= party["signed_at"].strftime("%m/%d/%Y %H:%M") %></span>
+    <span class="green">Signed at <%= party["signed_at"].in_time_zone("US/Eastern").strftime("%b, %d, %H:%M:%S %Z") %></span>
   <% end %>)</p>
   <p>Email: <%= party["email"] %></p>
 </div>
