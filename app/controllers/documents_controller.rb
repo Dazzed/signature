@@ -4,8 +4,26 @@ class DocumentsController < ApplicationController
   before_action :get_template_data, only: [:new, :create]
   
   def new
-    @deal_params = JSON.parse(@deal.deal_attributes)
-    render :layout => false
+    is_deal_already_signed = false
+    if !@deal.documents.nil?
+      if @deal.documents.count > 0
+        @deal.documents.last.parties.each do |party|
+          if party['is_pending_signature'] == true
+            is_deal_already_signed = false
+          else
+            is_deal_already_signed = true
+          end
+        end
+      end
+    end
+
+    if is_deal_already_signed == false
+      @deal_params = JSON.parse(@deal.deal_attributes)
+      render :layout => false
+    else
+      return render 'error/already_signed_warning'
+
+    end
   end
 
   def create

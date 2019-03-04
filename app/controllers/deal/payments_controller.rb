@@ -4,6 +4,7 @@ class Deal::PaymentsController < ApplicationController
   
   def new 
     @deal = Deal.find_by(:client_deal_id => params[:client_deal_id])
+    @document_id = params[:document_id]
     @deal_attributes = JSON.parse(@deal.deal_attributes)
     @client_email = params[:client_email]
   end
@@ -18,6 +19,7 @@ class Deal::PaymentsController < ApplicationController
       source: token,
     }).create_charge
 
+    @deal.update_attributes!(paid: true) 
     redirect_to deal_payment_thanks_path
   end
   

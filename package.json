@@ -1,5 +1,7 @@
 {
   "name": "hello_sign",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "js2coffee": "^2.2.0"
+  }
 }

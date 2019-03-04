@@ -4,6 +4,7 @@
     <% document.parties.each do |party| %>
       <%= render '/documents/party_signature_status', :party => party %>
     <% end %>
+    <p>Paid: <%= document.deal.paid == true ? "Yes" : "No" %></p>
     <%= link_to "Download Signed Document", document_signature_path(document.parties[0]["signature_request_id"]), target: "_blank" unless !document.complete %>
   </div>
 </div>

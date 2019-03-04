@@ -12,6 +12,7 @@ class Document
 
   belongs_to :deal
 
+  attr_accessor :api_link
   before_create :init_timestamp
   after_create :send_signing_request
 

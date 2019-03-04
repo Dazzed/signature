@@ -46,6 +46,10 @@ class Document::SignaturesController < ApplicationController
 
     # Redirect user to already signed page if he has already signed
     return render 'error/already_signed_warning' if @party["is_pending_signature"] != true
+    return render 'error/document_expired' if @document.deal.documents.last.id != @document.id
+    deal_params = JSON.parse(@document.deal.deal_attributes)
+    return render 'error/document_expired' if deal_params["expiry_date"].to_date <= Date.today
+    
   end  
 
   def validate_signature_request_id
