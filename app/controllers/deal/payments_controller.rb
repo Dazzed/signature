@@ -19,7 +19,9 @@ class Deal::PaymentsController < ApplicationController
       source: token,
     }).create_charge
 
-    @deal.update_attributes!(paid: true) 
+    @deal.update_attributes!(:paid => "Yes")
+    @deal = Deal.find_by(:client_deal_id => params[:client_deal_id])
+    puts @deal.to_json
     redirect_to deal_payment_thanks_path
   end
   
