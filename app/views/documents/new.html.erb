@@ -34,6 +34,7 @@
               type="text"
               class="form-control"
               required="true"
+              readonly="true"
               name="signer_roles[<%= signer_role.data["order"] %>]"
               value="<%= signerEmail %>" />
             <div class="form-check">
@@ -72,6 +73,7 @@
             type="text"
             class="form-control"
             required="true"
+            readonly="true"
             name="deal_attributes[<%= customField.data["api_id"] %>]"
             value="<%= value %>"
           >
@@ -83,3 +85,22 @@
     <button type="submit" class="btn btn-primary"><%= submitText %></button>
   </form>
 </div>
+<script type="text/javascript">
+  $(function() {
+    $("form#initiate_signing_form").submit(function(e) {
+      e.preventDefault();
+      var i=0;
+      $("input[type='text']").each(function(inp) {
+        if ($(this).val().trim() === '') {
+          $(this).css({
+            'border': '2px solid #dd0000'
+          });
+          if (i == 0) {
+            $('html, body').animate({scrollTop: $(this).offset().top - 50}, 2000);
+            i += 1;
+          }
+        }
+      });
+    });
+  });
+</script>
