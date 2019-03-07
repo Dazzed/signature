@@ -24,6 +24,7 @@ class SignaturesControllerTest < ActionDispatch::IntegrationTest
       :parties => parties,
       :template_id => template["template_id"],
       :document_title => template["title"],
+      :address => "",
       :deal_attributes => deal_attributes,
       :complete => false
     })

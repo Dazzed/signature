@@ -26,32 +26,33 @@ class UserNotifierMailerTest < ActionMailer::TestCase
       :parties => parties,
       :template_id => template["template_id"],
       :document_title => template["title"],
+      :address => "",
       :deal_attributes => deal_attributes.to_h,
       :complete => false
     })
 
     sleep(10)
     # Create the email and store it for further assertions
-    email = UserNotifierMailer.send_signature_request_email(Document.first.parties, 'niraj.bothra@gmail.com', ENV["EMAIL_SIGNING_URL"] + "?document_id=" + Document.first.id + "&order=0&&uuid=" + Document.first.parties[0]["uuid"], Document.first.document_title)
+    email = UserNotifierMailer.send_signature_request_email(Document.first.parties, 'niraj.bothra@gmail.com', ENV["EMAIL_SIGNING_URL"] + "?document_id=" + Document.first.id + "&order=0&&uuid=" + Document.first.parties[0]["uuid"], Document.first)
  
     assert_emails 1 do
       email.deliver_now
     end
  
     assert_equal ['niraj.bothra@gmail.com'], email.to
-    assert_equal Document.first.document_title, email.subject
+    assert_equal Document.first.address + " - Term Sheet", email.subject
   end
 
   test "email_signed_document" do
     # Create the email and store it for further assertions
-    email = UserNotifierMailer.email_signed_document("favicon.ico", Document.all.first.document_title, 'niraj.bothra@gmail.com')
+    email = UserNotifierMailer.email_signed_document("favicon.ico", Document.all.first, 'niraj.bothra@gmail.com')
  
     assert_emails 1 do
       email.deliver_now
     end
  
     assert_equal ['niraj.bothra@gmail.com'], email.to
-    assert_equal Document.first.document_title, email.subject
+    assert_equal Document.first.address + " - Term Sheet", email.subject
   end
 
 

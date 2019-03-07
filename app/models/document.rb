@@ -34,14 +34,14 @@ class Document
       new_party = all_parties.find{|party| party["order"] == 1}
       return if new_party.nil?
       link = "#{ENV['EMAIL_SIGNING_URL']}?document_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
-      UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, self.document_title).deliver
+      UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, self).deliver
     end
   end
   def send_signed_document(signature_request_id)
     all_parties = self.parties
     HellosignService::store_signed_document(signature_request_id)
     all_parties.each do |party|
-      UserNotifierMailer.email_signed_document(signature_request_id + '.pdf', self.document_title, party["email"]).deliver
+      UserNotifierMailer.email_signed_document(signature_request_id + '.pdf', self, party["email"]).deliver
     end
     self.complete = true
     self.save!

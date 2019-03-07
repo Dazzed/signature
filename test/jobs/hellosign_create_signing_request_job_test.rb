@@ -25,6 +25,7 @@ class HellosignCreateSigningRequestJobTest < ActiveJob::TestCase
       :parties => parties,
       :template_id => template["template_id"],
       :document_title => template["title"],
+      :address => "",
       :deal_attributes => deal_attributes.to_h,
       :complete => false
     })

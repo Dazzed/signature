@@ -67,7 +67,7 @@ class HellosignService
       :test_mode => 1,
       :client_id => ENV["HELLO_SIGN_CLIENT_ID"],
       :template_id => document.template_id,
-      :subject => document.title,
+      :subject => document.document_title,
       :message => "Signature requested at #{Time.now}",
       :signers => signers,
       :custom_fields => document.deal_attributes.map{ |k,v| {:name => k, :value => v} },

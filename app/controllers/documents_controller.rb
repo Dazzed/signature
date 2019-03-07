@@ -37,6 +37,7 @@ class DocumentsController < ApplicationController
       :template_id => @target_template["template_id"],
       :document_title => @target_template["title"],
       :deal_attributes => params["deal_attributes"].permit!.to_h,
+      :address => params[:formatted_address],
       :complete => false
     })
 

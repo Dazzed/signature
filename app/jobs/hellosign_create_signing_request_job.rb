@@ -22,7 +22,7 @@ class HellosignCreateSigningRequestJob < ApplicationJob
           document.parties, 
           party[:email], 
           link, 
-          document.document_title
+          document
         ).deliver
       end
     }

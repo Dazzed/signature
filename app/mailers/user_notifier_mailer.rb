@@ -8,7 +8,7 @@ class UserNotifierMailer < ApplicationMailer
 
     mail(
       :to => target_email,
-      :subject => document
+      :subject => document.address + " - Term Sheet"
     )
   end
 
@@ -17,7 +17,7 @@ class UserNotifierMailer < ApplicationMailer
     attachments["#{file}"] = File.read("public/" + file)
     mail(
       :to => email,
-      :subject => document
+      :subject => document.address + " - Term Sheet"
     )
   end
 

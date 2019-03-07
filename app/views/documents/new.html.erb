@@ -77,6 +77,16 @@
             name="deal_attributes[<%= customField.data["api_id"] %>]"
             value="<%= value %>"
           >
+          <% if customField.data["name"] == "formatted_address" %>
+          <input 
+            type="hidden"
+            class="form-control"
+            required="true"
+            readonly="true"
+            name="formatted_address"
+            value="<%= value %>"
+          >
+          <% end %>
         </div>
         </div>
       <% end %>
@@ -88,7 +98,6 @@
 <script type="text/javascript">
   $(function() {
     $("form#initiate_signing_form").submit(function(e) {
-      e.preventDefault();
       var i=0;
       $("input[type='text']").each(function(inp) {
         if ($(this).val().trim() === '') {
@@ -101,6 +110,11 @@
           }
         }
       });
+      if (i == 0) {
+        return;
+      } else {
+        e.preventDefault();
+      }
     });
   });
 </script>

@@ -28,6 +28,7 @@ class DocumentTest < ActiveSupport::TestCase
       :template_id => template["template_id"],
       :document_title => template["title"],
       :deal_attributes => deal_attributes.to_h,
+      :address => "",
       :complete => false
     })
 
