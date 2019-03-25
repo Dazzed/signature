@@ -1,2 +1,2 @@
 require 'stripe'
-Stripe.api_key = ENV["STRIPE_SK"]
+Stripe.api_key = Rails.application.credentials[:STRIPE_SK]

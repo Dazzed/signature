@@ -17,7 +17,7 @@ class HellosignCreateSigningRequestJob < ApplicationJob
     #email the first person to sign the document
     document.parties.each { |party|
       if party[:order] == 0
-        link = "#{ENV['EMAIL_SIGNING_URL']}?document_id=#{document.id.to_s}&uuid=#{party[:uuid]}&order=#{party[:order]}"
+        link = "#{Rails.application.credentials[:EMAIL_SIGNING_URL]}?document_id=#{document.id.to_s}&uuid=#{party[:uuid]}&order=#{party[:order]}"
         UserNotifierMailer.send_signature_request_email(
           document.parties, 
           party[:email], 
