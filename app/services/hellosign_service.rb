@@ -65,7 +65,7 @@ class HellosignService
     end
     HelloSign.create_embedded_signature_request_with_template(  
       :test_mode => 1,
-      :client_id => Rails.application.credentials[:HELLO_SIGN_CLIENT_ID],
+      :client_id => Rails.application.credentials[Rails.env.to_sym][:HELLO_SIGN_CLIENT_ID],
       :template_id => document.template_id,
       :subject => document.document_title,
       :message => "Signature requested at #{Time.now}",

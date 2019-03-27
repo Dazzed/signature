@@ -33,7 +33,7 @@ class Document
     if party["order"] == 0
       new_party = all_parties.find{|party| party["order"] == 1}
       return if new_party.nil?
-      link = "#{Rails.application.credentials[:EMAIL_SIGNING_URL]}?document_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
+      link = "#{Rails.application.credentials[Rails.env.to_sym][:EMAIL_SIGNING_URL]}?document_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
       UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, self).deliver
     end
   end

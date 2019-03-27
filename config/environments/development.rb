@@ -60,8 +60,8 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   ActionMailer::Base.smtp_settings = {
-    :user_name => Rails.application.credentials[:SENDGRID_USERNAME],
-    :password => Rails.application.credentials[:SENDGRID_PASSWORD],
+    :user_name => Rails.application.credentials[Rails.env.to_sym][:SENDGRID_USERNAME],
+    :password => Rails.application.credentials[Rails.env.to_sym][:SENDGRID_PASSWORD],
     :domain => 'ftf.com',
     :address => 'smtp.sendgrid.net',
     :port => 587,
