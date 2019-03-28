@@ -14,6 +14,7 @@ class Document::SubscriptionAgreementController < ApplicationController
     client_deal_id = params[:client_deal_id]
     return render 'error/error_page' unless client_deal_id
     @deal = Deal.find_or_create_by!(client_deal_id: client_deal_id)
+    @deal.update_attributes!(deal_attributes: params.to_json) unless !params[:show_status].nil?
   end
 
   def get_template
@@ -24,7 +25,7 @@ class Document::SubscriptionAgreementController < ApplicationController
 
   def create_document
     signer_roles = { "0"=> params[:Issuer], "1"=> params[:Subscriber] }
-    parties = HellosignService::get_parties(@target_template, signer_roles, { "0"=>"true" })
+    parties = HellosignService::get_parties(@target_template, signer_roles, { "0"=>"false" })
 
     new_document = @deal.documents.create({
       :client_deal_id => @deal.client_deal_id,
