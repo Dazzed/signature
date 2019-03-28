@@ -33,7 +33,7 @@ class UserNotifierMailerTest < ActionMailer::TestCase
 
     sleep(10)
     # Create the email and store it for further assertions
-    email = UserNotifierMailer.send_signature_request_email(Document.first.parties, 'niraj.bothra@gmail.com', ENV["EMAIL_SIGNING_URL"] + "?document_id=" + Document.first.id + "&order=0&&uuid=" + Document.first.parties[0]["uuid"], Document.first)
+    email = UserNotifierMailer.send_signature_request_email(Document.first.parties, 'niraj.bothra@gmail.com', Rails.application.credentials[Rails.env.to_sym][:EMAIL_SIGNING_URL] + "?document_id=" + Document.first.id + "&order=0&&uuid=" + Document.first.parties[0]["uuid"], Document.first)
  
     assert_emails 1 do
       email.deliver_now

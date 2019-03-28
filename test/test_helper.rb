@@ -1,4 +1,4 @@
-ENV['RAILS_ENV'] ||= 'test'
+Rails.application.credentials[Rails.env.to_sym][:RAILS_ENV] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'
 require 'database_cleaner'
