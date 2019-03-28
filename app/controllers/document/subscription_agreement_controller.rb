@@ -24,7 +24,7 @@ class Document::SubscriptionAgreementController < ApplicationController
   end
 
   def create_document
-    signer_roles = { "0"=> params[:Issuer], "1"=> params[:Subscriber] }
+    signer_roles = { "0"=> params[:Subscriber], "1"=> params[:Issuer] }
     parties = HellosignService::get_parties(@target_template, signer_roles, { "0"=>"false" })
 
     new_document = @deal.documents.create({
@@ -32,9 +32,13 @@ class Document::SubscriptionAgreementController < ApplicationController
       :parties => parties,
       :template_id => @target_template["template_id"],
       :document_title => @target_template["title"],
-      :deal_attributes => {},
+      :deal_attributes => subscription_attributes,
       :address => '123 Fake St',
       :complete => false
     })
+  end
+
+  def subscription_attributes
+    params.permit(SUBSCRIPTION_AGREEMENT_FIELDS).to_h
   end
 end
