@@ -48,8 +48,8 @@ class Document::SignaturesController < ApplicationController
     return render 'error/already_signed_warning' if @party["is_pending_signature"] != true
     return render 'error/document_expired' if @document.deal.documents[@document.deal.documents.count - 1].id != @document.id
     deal_params = JSON.parse(@document.deal.deal_attributes)
+    return if deal_params['template_id'] == HELLOSIGN_TEMPLATES[:SUBSCRIPTION_AGREEMENT]
     return render 'error/document_expired' if deal_params["expiry_date"].to_date <= Date.today
-    
   end  
 
   def validate_signature_request_id

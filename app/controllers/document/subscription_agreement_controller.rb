@@ -5,7 +5,7 @@ class Document::SubscriptionAgreementController < ApplicationController
   before_action :create_document
 
   def new
-    # code here
+    render json: {"success": true}
   end
 
   private
