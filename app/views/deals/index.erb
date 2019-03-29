@@ -12,6 +12,7 @@
       </li>
     </ul>
     <div class="tab-content" id="deal-details-content">
+      <div id="myHSContainer" style="overflow: scroll; pointer-events:none;"></div>
       <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
         <div id="document-container">
           <% if @deal.documents.length > 0 %>
@@ -41,7 +42,10 @@
     HelloSign.init('<%= Rails.application.credentials[Rails.env.to_sym][:HELLO_SIGN_CLIENT_ID] %>');
     HelloSign.open({
       url: '<%= @preview_url %>',
-      skipDomainVerification: true
+      skipDomainVerification: true,
+      "container": document.getElementById('myHSContainer'),
+      "height": 4500
     });
   });
+
 </script>
