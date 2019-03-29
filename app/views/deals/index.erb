@@ -7,6 +7,9 @@
       <li class="nav-item">
         <a class="nav-link " id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Documents Status</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link " id="preview-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Term Sheet Preview</a>
+      </li>
     </ul>
     <div class="tab-content" id="deal-details-content">
       <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
@@ -26,8 +29,19 @@
     </div>
   </div>
 </div>
+<script type="text/javascript" src="https://s3.amazonaws.com/cdn.hellosign.com/public/js/hellosign-embedded.LATEST.min.js"></script>
 <script type="text/javascript">
   $(function () {
     getTemplate('<%= @deal_params["template_id"] %>', '<%= @deal[:client_deal_id] %>');
+  });
+
+  const container = document.getElementById('document-container');
+  const preview = document.getElementById('preview-tab');
+  $(preview).click(function (event) {
+    HelloSign.init('<%= Rails.application.credentials[Rails.env.to_sym][:HELLO_SIGN_CLIENT_ID] %>');
+    HelloSign.open({
+      url: '<%= @preview_url %>',
+      skipDomainVerification: true
+    });
   });
 </script>
