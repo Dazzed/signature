@@ -39,6 +39,8 @@
   const container = document.getElementById('document-container');
   const preview = document.getElementById('preview-tab');
   $(preview).click(function (event) {
+    container.style.display = 'none';
+    document.getElementById("myHSContainer").style.display = 'inherit';
     HelloSign.init('<%= Rails.application.credentials[Rails.env.to_sym][:HELLO_SIGN_CLIENT_ID] %>');
     HelloSign.open({
       url: '<%= @preview_url %>',
@@ -46,6 +48,16 @@
       "container": document.getElementById('myHSContainer'),
       "height": 4500
     });
+  });
+
+  $('#form-tab').click(e => {
+    document.getElementById("myHSContainer").style.display = 'none';
+    container.style.display = 'inherit';
+  });
+
+  $('#documents-tab').click(e => {
+    document.getElementById("myHSContainer").style.display = 'none';
+    container.style.display = 'inherit';
   });
 
 </script>
