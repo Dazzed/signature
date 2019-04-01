@@ -1,10 +1,11 @@
 require 'open-uri'
 class Document::SubscriptionAgreementController < ApplicationController
-  before_action :get_deal, only: [:new]
-  before_action :get_template, only: [:new]
-  before_action :create_document
 
   def new
+    get_deal
+    get_template
+    create_document
+
     render json: {"success": true}
   end
 

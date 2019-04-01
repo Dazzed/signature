@@ -39,6 +39,7 @@ class Document::SignaturesController < ApplicationController
     end
   end
 
+  # TODO refactor, not scalable
   def get_signer_information
     @party_index = @document.parties.find_index{ |party| party["uuid"] == params[:uuid] }
     return render 'error/error_page' if @party_index.nil?
