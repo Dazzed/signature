@@ -28,7 +28,7 @@ class DocumentsController < ApplicationController
 
   def create
     # Construct parties info to save in the newly created document based on info from the hellosign template and form data
-    parties = HellosignService::get_parties(@target_template, params[:signer_roles], params[:signer_roles_pay])
+    parties = SignatureService::get_parties(@target_template, params[:signer_roles], params[:signer_roles_pay])
 
     # Create a new document in database
     new_document = @deal.documents.create({
@@ -56,7 +56,7 @@ class DocumentsController < ApplicationController
     unless params[:template_id]
       return render 'error/error_page'
     end
-    @target_template = HellosignService::get_template_data(params[:template_id])
+    @target_template = SignatureService::get_template_data(params[:template_id])
     unless @target_template
       return render 'error/error_page'
     end

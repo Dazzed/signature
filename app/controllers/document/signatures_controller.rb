@@ -8,13 +8,13 @@ class Document::SignaturesController < ApplicationController
 
   def new
     #Create an embedded template request for signing.
-    @signed_url = HellosignService::get_embedded_sign_url(@document.parties[@party_index][:signature_id])
+    @signed_url = SignatureService::get_embedded_sign_url(@document.parties[@party_index][:signature_id])
     @should_pay = @document.parties[@party_index]["should_pay"]
     @client_email = @party["email"]
   end
 
   def show
-    file_bin = HellosignService::signature_request_files(@signature_request_id)
+    file_bin = SignatureService::signature_request_files(@signature_request_id)
     send_data file_bin, :disposition => 'attachment', :filename=>"signedDocument.pdf"
   end
 

@@ -3,7 +3,7 @@ class Document::SubscriptionAgreementController < ApplicationController
 
   def new
     get_template
-    return render 'error/error_page', locals: {msg: 'Invalid template'} if @target_template.nil?
+    return render 'error/error_page' if @target_template.nil?
   
     get_and_update_deal
     create_document
@@ -22,13 +22,13 @@ class Document::SubscriptionAgreementController < ApplicationController
 
   def get_template
     if HELLOSIGN_TEMPLATES.values.include?(params[:template_id])
-      @target_template = HellosignService::get_template_data(params[:template_id])
+      @target_template = SignatureService::get_template_data(params[:template_id])
     end
   end
 
   def create_document
     signer_roles = { "0"=> params[:Subscriber], "1"=> params[:Issuer] }
-    parties = HellosignService::get_parties(@target_template, signer_roles, { "0"=>"false" })
+    parties = SignatureService::get_parties(@target_template, signer_roles, { "0"=>"false" })
 
     new_document = @deal.documents.create({
       :client_deal_id => @deal.client_deal_id,

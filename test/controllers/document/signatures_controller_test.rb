@@ -9,13 +9,13 @@ class SignaturesControllerTest < ActionDispatch::IntegrationTest
     deal.save
 
     template_id = "45b50b15cae62dba5999ee13ba80107098c185d7"
-    template = HellosignService::get_template_data(template_id)
+    template = SignatureService::get_template_data(template_id)
     client_deal_id = deal_params["client_deal_id"]
     signer_roles = {"0"=>"niraj.bothra@gmail.com", "1"=>"sameep.dev@gmail.com"}
     signer_roles_pay = {"0"=>"true", "1"=>"true"}
     deal_attributes = {"cff33a_9"=>"Senior React JS Developer"}
 
-    parties = HellosignService::get_parties(template, signer_roles, signer_roles_pay)
+    parties = SignatureService::get_parties(template, signer_roles, signer_roles_pay)
 
     deal = Deal.find_by(:client_deal_id => client_deal_id)
     # Create a new document in database

@@ -1,7 +1,7 @@
 require "hello_sign"
 require 'securerandom'
 
-class HellosignService
+class SignatureService
 
   def self.get_templates
     template_list = HelloSign.get_templates
