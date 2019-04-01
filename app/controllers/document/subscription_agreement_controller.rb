@@ -2,8 +2,10 @@ require 'open-uri'
 class Document::SubscriptionAgreementController < ApplicationController
 
   def new
-    get_deal
     get_template
+    return render 'error/error_page', locals: {msg: 'Invalid template'} if @target_template.nil?
+  
+    get_and_update_deal
     create_document
 
     render json: {"success": true}
@@ -11,7 +13,7 @@ class Document::SubscriptionAgreementController < ApplicationController
 
   private
 
-  def get_deal
+  def get_and_update_deal
     client_deal_id = params[:client_deal_id]
     return render 'error/error_page' unless client_deal_id
     @deal = Deal.find_or_create_by!(client_deal_id: client_deal_id)
@@ -19,9 +21,9 @@ class Document::SubscriptionAgreementController < ApplicationController
   end
 
   def get_template
-    @target_template = HellosignService::get_template_data(params[:template_id])
-  rescue  
-    return render 'error/error_page'
+    if HELLOSIGN_TEMPLATES.values.include?(params[:template_id])
+      @target_template = HellosignService::get_template_data(params[:template_id])
+    end
   end
 
   def create_document
