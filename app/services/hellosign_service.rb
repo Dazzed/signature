@@ -92,26 +92,27 @@ class HellosignService
     HelloSign.get_embedded_sign_url :signature_id => sign_id
   end
 
-  def self.preview(params)
+  def self.preview(preview_params, custom_fields)
     preview = HelloSign.create_embedded_unclaimed_draft_with_template(
         :test_mode => 1,
         :client_id => Rails.application.credentials[Rails.env.to_sym][:HELLO_SIGN_CLIENT_ID],
-        :template_id => params[:template_id],
+        :template_id => preview_params[:template_id],
         :requester_email_address => 'investorrelations@fundthatflip.com',
         :signing_redirect_url => 'https://www.fundthatflip.com/',
         :requesting_redirect_url => 'https://www.fundthatflip.com/',
         :signers => [
           {
-            :email_address => params[:borrower_email],
-            :name => params[:borrower_name],
+            :email_address => preview_params[:borrower_email],
+            :name => preview_params[:borrower_name],
             :role => 'Borrower'
           },
           {
-            :email_address => params[:approver_email],
-            :name => params[:approver_name],
+            :email_address => preview_params[:approver_email],
+            :name => preview_params[:approver_name],
             :role => 'Approver'
           }
-        ]
+        ],
+        :custom_fields => custom_fields.map{ |k,v| {:name => k, :value => v} }
     )
     preview.claim_url
   end

@@ -8,7 +8,7 @@ class DealsController < ApplicationController
     @deal = Deal.find_or_create_by!(:client_deal_id => params[:client_deal_id])
     @deal.update_attributes!(deal_attributes: params.to_json) unless !params[:show_status].nil?
     @deal_params = JSON.parse(@deal.deal_attributes)
-    @preview_url = HellosignService::preview(preview_params) if params[:template_id].present?
+    @preview_url = HellosignService::preview(preview_params, custom_fields_params) if params[:template_id].present?
     @template_id = params[:template_id]
   end
   
@@ -26,5 +26,9 @@ class DealsController < ApplicationController
       approver_email: params[:Approver],
       approver_name: params[:approver_name]
     }
+  end
+
+  def custom_fields_params
+    @deal_params.select{|k, v| TERM_SHEET_CUSTOM_FIELDS.include?(k) }
   end
 end
