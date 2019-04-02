@@ -9,7 +9,6 @@ class DealsController < ApplicationController
     @deal.update_attributes!(deal_attributes: params.to_json) unless !params[:show_status].nil?
     @deal_params = JSON.parse(@deal.deal_attributes)
     @preview_url = HellosignService::preview(preview_params, custom_fields_params) if params[:template_id].present?
-    @template_id = params[:template_id]
   end
   
   private
