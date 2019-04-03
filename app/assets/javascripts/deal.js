@@ -28,22 +28,22 @@ const nonPreviewTabs = ["#form-tab", "#documents-tab"];
 
 const getPreview = (client, url) => {
   const $container = $("#document-container");
-  const $previewContainer = $("#previewContainer");
+  const $previewContainer = $("#preview-container");
 
-  $("#preview-tab").click(() => {
+  $("#preview-tab").on("click", () => {
     $container.css("display", "none");
     $previewContainer.css("display", "inherit");
     HelloSign.init(client);
     HelloSign.open({
       url,
       skipDomainVerification: true,
-      container: document.getElementById("previewContainer"),
+      container: $previewContainer[0],
       height: 5500
     });
   });
 
   nonPreviewTabs.forEach(tab => {
-    $(tab).click(e => {
+    $(tab).on("click", () => {
       $previewContainer.css("display", "none");
       $container.css("display", "inherit");
     });
