@@ -8,6 +8,7 @@ class DealsController < ApplicationController
     @deal = Deal.find_or_create_by!(:client_deal_id => params[:client_deal_id])
     @deal.update_attributes!(deal_attributes: params.to_json) unless !params[:show_status].nil?
     @deal_params = JSON.parse(@deal.deal_attributes)
+    @template_id = params[:template_id]
     @preview_url = HellosignService::preview(preview_params, custom_fields_params) if params[:template_id].present?
   end
   
@@ -27,7 +28,16 @@ class DealsController < ApplicationController
     }
   end
 
+  def non_broker_templates
+    HELLOSIGN_TEMPLATES.key(@template_id).to_s.include?('NO_BROKER')
+  end
+
   def custom_fields_params
-    @deal_params.select{|k, v| TERM_SHEET_CUSTOM_FIELDS.include?(k) }
+    custom_fields = if non_broker_templates
+                      TERM_SHEET_CUSTOM_FIELDS.select{ |field| !field.include?('broker') }
+                    else
+                      custom_fields = TERM_SHEET_CUSTOM_FIELDS
+                    end
+    @deal_params.select{|k, v| custom_fields.include?(k) }
   end
 end
