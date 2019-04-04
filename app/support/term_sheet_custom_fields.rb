@@ -1,0 +1,33 @@
+# constant custom fields for term sheet
+
+TERM_SHEET_CUSTOM_FIELDS = [
+  "term_sheet_creation_date",
+  "borrower_first_name",
+  "approver_note",
+  "formatted_address",
+  "borrower_entity",
+  "borrower_full_name",
+  "formatted_gross_loan",
+  "formatted_loan_term",
+  "formatted_loan_extension_term",
+  "term_sheet_termination_date",
+  "formatted_apr",
+  "formatted_origination_fee",
+  "formatted_purchase_distribution",
+  "formatted_construction_holdback",
+  "number_of_draws",
+  "formatted_prepaid_interest_amount",
+  "formatted_purchase_price",
+  "formatted_arv",
+  "formatted_legal_expenses",
+  "formatted_borrower_deposit",
+  "approver_name",
+  "broker_name",
+  "formatted_extension_fee",
+  "formatted_broker_fee",
+  "formatted_broker_processing_fee",
+  "borrower_entity_footer",
+  "borrower_full_name_footer",
+  "formatted_prepaid_interest_period_2",
+  "formatted_prepaid_interest_period_1"
+].freeze
