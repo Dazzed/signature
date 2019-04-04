@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   namespace :document do
     resources :signatures, only: [:new, :show]
     resources :signature_thanks, only: :index
+    resources :subscription_agreement, only: :new
   end
 
   namespace :callbacks do

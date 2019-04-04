@@ -4,7 +4,7 @@ class HellosignCreateSigningRequestJob < ApplicationJob
   def perform(document)
     # Do something later
 
-    embedded_request = HellosignService::create_embedded_signature_request_with_template(document)
+    embedded_request = SignatureService::create_embedded_signature_request_with_template(document)
     signature_request_id = embedded_request.data["signature_request_id"]
 
     #update the signature_id and signature_request_id on document.

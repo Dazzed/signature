@@ -1,9 +1,11 @@
 <script type="text/javascript" src="https://s3.amazonaws.com/cdn.hellosign.com/public/js/hellosign-embedded.LATEST.min.js"></script>
 <script type="text/javascript">
+  const skipDomainVerification = "<%= Rails.env %>" === 'development';
   HelloSign.init("<%= Rails.application.credentials[Rails.env.to_sym][:HELLO_SIGN_CLIENT_ID] %>");
   HelloSign.open({
     url: "<%= @signed_url.raw_data["sign_url"] %>",
     allowCancel: true,
+    skipDomainVerification,
     messageListener: function(eventData) {
       if (eventData.event == HelloSign.EVENT_SIGNED) {
         var should_pay = <%= @should_pay %>;

@@ -8,13 +8,13 @@ class Document::SignaturesController < ApplicationController
 
   def new
     #Create an embedded template request for signing.
-    @signed_url = HellosignService::get_embedded_sign_url(@document.parties[@party_index][:signature_id])
+    @signed_url = SignatureService::get_embedded_sign_url(@document.parties[@party_index][:signature_id])
     @should_pay = @document.parties[@party_index]["should_pay"]
     @client_email = @party["email"]
   end
 
   def show
-    file_bin = HellosignService::signature_request_files(@signature_request_id)
+    file_bin = SignatureService::signature_request_files(@signature_request_id)
     send_data file_bin, :disposition => 'attachment', :filename=>"signedDocument.pdf"
   end
 
@@ -39,6 +39,7 @@ class Document::SignaturesController < ApplicationController
     end
   end
 
+  # TODO refactor, not scalable
   def get_signer_information
     @party_index = @document.parties.find_index{ |party| party["uuid"] == params[:uuid] }
     return render 'error/error_page' if @party_index.nil?
@@ -48,8 +49,8 @@ class Document::SignaturesController < ApplicationController
     return render 'error/already_signed_warning' if @party["is_pending_signature"] != true
     return render 'error/document_expired' if @document.deal.documents[@document.deal.documents.count - 1].id != @document.id
     deal_params = JSON.parse(@document.deal.deal_attributes)
+    return if deal_params['template_id'] == HELLOSIGN_TEMPLATES[:SUBSCRIPTION_AGREEMENT]
     return render 'error/document_expired' if deal_params["expiry_date"].to_date <= Date.today
-    
   end  
 
   def validate_signature_request_id
