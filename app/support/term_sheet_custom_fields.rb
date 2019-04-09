@@ -3,7 +3,6 @@
 TERM_SHEET_CUSTOM_FIELDS = [
   "term_sheet_creation_date",
   "borrower_first_name",
-  "approver_note",
   "formatted_address",
   "borrower_entity",
   "borrower_full_name",
