@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 * {
-  font-family: 'Nunito Sans';
+  font-family: "Nunito Sans";
 }
 
 .centering-request {
@@ -80,12 +80,13 @@ p {
   border-color: #495057;
 }
 
-.nav-tabs .nav-link, .nav-tabs .nav-link:hover {
+.nav-tabs .nav-link,
+.nav-tabs .nav-link:hover {
   border-width: 0 0 3px 0;
 }
 
 .nav-tabs a.nav-link {
-  color: lighten( #495057, 0.1);
+  color: lighten(#495057, 0.1);
 }
 .form-group {
   margin: 1em;
@@ -100,4 +101,8 @@ p {
 
 .lead {
   margin-top: 30px;
+}
+
+.pb-0 {
+  padding: 1.5rem 1.5rem 0rem 1.5rem;
 }

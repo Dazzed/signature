@@ -7,11 +7,13 @@
       <li class="nav-item">
         <a class="nav-link " id="documents-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Documents Status</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link " id="preview-tab" data-toggle="tab" href="#documents" role="tab" aria-controls="documents" aria-selected="false">Term Sheet Preview</a>
-      </li>
     </ul>
     <div class="tab-content" id="deal-details-content">
+      <div class="row">
+        <div class="col-3">
+          <div class="btn btn-primary btn-sm" id="preview-back-btn" style="display: none; margin: 0.5rem">Back</div>
+        </div>
+      </div>
       <div id="preview-container" style="overflow: scroll; pointer-events:none;"></div>
       <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
         <div id="document-container">
@@ -25,6 +27,11 @@
         </div>
       </div>
       <div class="tab-pane fade show active" id="form" role="tabpanel" aria-labelledby="form-tab">
+        <div class="row pb-0">
+          <div class="col-12">
+            <div class="btn btn-block btn-warning" id="preview-tab">Preview</div>
+          </div>
+        </div>
         <div class="row p-4" id="form-container"></div>
       </div>
     </div>
