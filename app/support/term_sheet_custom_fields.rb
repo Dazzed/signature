@@ -27,6 +27,6 @@ TERM_SHEET_CUSTOM_FIELDS = [
   "formatted_broker_processing_fee",
   "borrower_entity_footer",
   "borrower_full_name_footer",
-  "formatted_prepaid_interest_period_2",
-  "formatted_prepaid_interest_period_1"
+  "formatted_prepaid_interest_period",
+  "minimum_interest_upon_prepayment"
 ].freeze
