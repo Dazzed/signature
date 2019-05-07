@@ -27,11 +27,13 @@ $(function() {
 const nonPreviewTabs = ["#form-tab", "#documents-tab"];
 
 const getPreview = (client, url) => {
-  const $container = $("#document-container");
+  const $container = $("#form");
   const $previewContainer = $("#preview-container");
+  const $previewBackBtn = $("#preview-back-btn");
 
   $("#preview-tab").on("click", () => {
     $container.css("display", "none");
+    $previewBackBtn.css("display", "inherit");
     $previewContainer.css("display", "inherit");
     HelloSign.init(client);
     HelloSign.open({
@@ -46,6 +48,13 @@ const getPreview = (client, url) => {
     $(tab).on("click", () => {
       $previewContainer.css("display", "none");
       $container.css("display", "inherit");
+      $previewBackBtn.css("display", "none");
     });
+  });
+
+  $previewBackBtn.on("click", () => {
+    $previewBackBtn.css("display", "none");
+    $previewContainer.css("display", "none");
+    $container.css("display", "inherit");
   });
 };
