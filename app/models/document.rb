@@ -30,12 +30,11 @@ class Document
 
   def email_next_party(party)
     all_parties = self.parties
-    if party["order"] == 0
-      new_party = all_parties.find{|party| party["order"] == 1}
-      return if new_party.nil?
-      link = "#{Rails.application.credentials[Rails.env.to_sym][:EMAIL_SIGNING_URL]}?document_id=#{self.id.to_s}&uuid=#{new_party["uuid"]}&order=#{new_party["order"]}"
-      UserNotifierMailer.send_signature_request_email(all_parties, new_party["email"], link, self).deliver
-    end
+    order = party["order"] + 1
+    next_party = all_parties.find{|party| party["order"] == order}
+    return if next_party.nil?
+    link = "#{Rails.application.credentials[Rails.env.to_sym][:EMAIL_SIGNING_URL]}?document_id=#{self.id.to_s}&uuid=#{next_party["uuid"]}&order=#{next_party["order"]}"
+    UserNotifierMailer.send_signature_request_email(all_parties, next_party["email"], link, self).deliver
   end
   def send_signed_document(signature_request_id)
     all_parties = self.parties

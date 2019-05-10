@@ -9,7 +9,7 @@ class DealsController < ApplicationController
     @deal.update_attributes!(deal_attributes: params.to_json) unless !params[:show_status].nil?
     @deal_params = JSON.parse(@deal.deal_attributes)
     @template_id = params[:template_id]
-    @preview_url = SignatureService::preview(preview_params, custom_fields_params) if params[:template_id].present?
+    # @preview_url = SignatureService::preview(preview_params, custom_fields_params) if params[:template_id].present?
   end
   
   private
