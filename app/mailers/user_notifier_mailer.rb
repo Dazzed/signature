@@ -6,16 +6,9 @@ class UserNotifierMailer < ApplicationMailer
     @target_email = target_email
     @link = link
 
-    # UNCOMMENT ME AFTER
-    # mail(
-    #   :to => target_email,
-    #   :subject => document.address + " - Term Sheet"
-    # )
-
-    # DELETE ME AFTER
     mail(
       :to => target_email,
-      :subject => " - Term Sheet"
+      :subject => document.address + " - Term Sheet"
     )
   end
 

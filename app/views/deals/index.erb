@@ -43,8 +43,8 @@
     getTemplate('<%= @deal_params["template_id"] %>', '<%= @deal[:client_deal_id] %>');
 
     const helloSignClient = '<%= Rails.application.credentials[Rails.env.to_sym][:HELLO_SIGN_CLIENT_ID] %>';
-    // const previewUrl = '<%= @preview_url %>';
+    const previewUrl = '<%= @preview_url %>';
 
-    // getPreview(helloSignClient, previewUrl);
+    getPreview(helloSignClient, previewUrl);
   });
 </script>
