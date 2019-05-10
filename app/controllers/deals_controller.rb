@@ -24,7 +24,9 @@ class DealsController < ApplicationController
       borrower_email: params[:Borrower],
       borrower_name: params[:borrower_full_name],
       approver_email: params[:Approver],
-      approver_name: params[:approver_name]
+      approver_name: params[:approver_name],
+      broker_email: params[:Broker],
+      broker_name: params[:broker_name]
     }
   end
 
