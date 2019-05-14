@@ -100,21 +100,21 @@ class SignatureService
         :requester_email_address => 'investorrelations@fundthatflip.com',
         :signing_redirect_url => 'https://www.fundthatflip.com/',
         :requesting_redirect_url => 'https://www.fundthatflip.com/',
-        :signers => [
-          {
-            :email_address => preview_params[:borrower_email],
-            :name => preview_params[:borrower_name],
-            :role => 'Borrower'
-          },
-          {
-            :email_address => preview_params[:approver_email],
-            :name => preview_params[:approver_name],
-            :role => 'Approver'
-          }
-        ],
+        :signers => find_signers_for_preview(preview_params),
         :custom_fields => custom_fields.map{ |k,v| {:name => k, :value => v} }
     )
     preview.claim_url
   end
 
+  def self.find_signers_for_preview(preview_params)
+    no_broker = HELLOSIGN_TEMPLATES.key(preview_params[:template_id]).to_s.include?('NO_BROKER')
+    roles = no_broker ? %w[Approver Borrower] : %w[Approver Broker Borrower]
+    return roles.map do |role|
+      {
+        :email_address => preview_params["#{role}_email".downcase.to_sym],
+        :name => preview_params["#{role}_name".downcase.to_sym],
+        :role => role
+      }
+    end
+  end
 end
